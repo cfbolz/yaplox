@@ -1,21 +1,14 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING, Any, Dict
-
 from yaplox.token import Token
 from yaplox.yaplox_runtime_error import YaploxRuntimeError
 
-if TYPE_CHECKING:
-    from yaplox.yaplox_class import YaploxClass
 
-
-class YaploxInstance:
+class YaploxInstance(object):
     def __init__(self, klass ):
         self.klass = klass
         self.fields   = {}
 
     def __repr__(self)  :
-        return f"{self.klass.name} instance"
+        return "%s instance" % (self.klass.name, )
 
     def get(self, name )  :
         try:
@@ -27,7 +20,7 @@ class YaploxInstance:
         if method is not None:
             return method.bind(self)
 
-        raise YaploxRuntimeError(name, f"Undefined property '{name.lexeme}'.")
+        raise YaploxRuntimeError(name, "Undefined property '%s'." % (name.lexeme, ))
 
     def set(self, name , value ):
         self.fields[name.lexeme] = value

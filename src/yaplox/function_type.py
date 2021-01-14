@@ -1,8 +1,5 @@
-import enum
-
-
-class FunctionType(enum.Enum):
-    NONE = enum.auto()
-    FUNCTION = enum.auto()
-    INITIALIZER = enum.auto()
-    METHOD = enum.auto()
+class FunctionType(object):
+    NONE = 0
+    FUNCTION = 1
+    INITIALIZER = 2
+    METHOD = 3

@@ -1,5 +1,3 @@
-from typing import Any, Callable, Dict, List
-
 from yaplox.token import Token
 from yaplox.token_type import TokenType
 
@@ -135,19 +133,15 @@ class Scanner:
                 TokenType.GREATER_EQUAL if self._match("=") else TokenType.GREATER
             ),
             "/": self._operator_slash,
-            # These statements do nothing and are ignored. Since we need something that
-            # is callable, a empty callable is returned. This is a little bit faster
-            # than calling `lambda: None`
-            " ": type(None),
-            "\r": type(None),
-            "\t": type(None),
+            " ": lambda: None,
+            "\r": lambda: None,
+            "\t": lambda: None,
             "\n": self._operator_newline,
             '"': self._string,
         }  # type: Dict[str, Callable]
 
         try:
-            option = token_options[c]
-            option()
+            token_options[c]()
         except KeyError:
             # This is the 'default' case in the Java switch statement
             if c.isdigit():
@@ -159,7 +153,7 @@ class Scanner:
             elif self.on_error:
                 # If we have an on_error callback, run this, otherwise raise the
                 # error again
-                self.on_error(self.line, f"Unexpected character: {c}")
+                self.on_error(self.line, "Unexpected character: %s" % (c, ))
             else:
                 raise
 

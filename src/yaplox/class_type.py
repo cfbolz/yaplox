@@ -1,7 +1,5 @@
-import enum
 
-
-class ClassType(enum.Enum):
-    NONE = enum.auto()
-    CLASS = enum.auto()
-    SUBCLASS = enum.auto()
+class ClassType(object):
+    NONE = 0
+    CLASS = 1
+    SUBCLASS = 2

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from yaplox.environment import Environment
 from yaplox.stmt import Function
 from yaplox.yaplox_callable import YaploxCallable
@@ -45,4 +43,4 @@ class YaploxFunction(YaploxCallable):
         return len(self.declaration.params)
 
     def __str__(self):
-        return f"<fn {self.declaration.name.lexeme}>"
+        return "<fn %s>" % (self.declaration.name.lexeme, )

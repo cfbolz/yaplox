@@ -1,6 +1,3 @@
-from __future__ import annotations
-
-from typing import Any, Dict, Optional
 
 from yaplox.token import Token
 from yaplox.yaplox_runtime_error import YaploxRuntimeError
@@ -39,7 +36,7 @@ class Environment:
         if self.enclosing:
             return self.enclosing.get(name)
 
-        raise YaploxRuntimeError(name, f"Undefined variable '{name.lexeme}'.")
+        raise YaploxRuntimeError(name, "Undefined variable '%s'." % (name.lexeme, ))
 
     def assign(self, name , value ):
         """Assign a new value to an existing variable. Eg:
@@ -54,7 +51,7 @@ class Environment:
             self.enclosing.assign(name, value)
             return
 
-        raise YaploxRuntimeError(name, f"Undefined variable '{name.lexeme}'.")
+        raise YaploxRuntimeError(name, "Undefined variable '%s'." % (name.lexeme, ))
 
     def assign_at(self, distance , name , value ):
         self._ancestor(distance).values[name.lexeme] = value

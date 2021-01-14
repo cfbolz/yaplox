@@ -1,5 +1,3 @@
-from typing import List, Optional
-
 from yaplox.expr import (
     Assign,
     Binary,
@@ -52,7 +50,8 @@ class Parser:
     def parse(self)  :
         statements = []
         while not self._is_at_end():
-            if declaration := self._declaration():
+            declaration = self._declaration()
+            if declaration:
                 statements.append(declaration)
 
         return statements
@@ -88,8 +87,8 @@ class Parser:
         return Class(name=name, superclass=superclass, methods=methods)
 
     def _function(self, kind )  :
-        name = self._consume(TokenType.IDENTIFIER, f"Expect {kind} name.")
-        self._consume(TokenType.LEFT_PAREN, f"Expect '(' after {kind} name.")
+        name = self._consume(TokenType.IDENTIFIER, "Expect %s name." % (kind, ))
+        self._consume(TokenType.LEFT_PAREN, "Expect '(' after %s name." % (kind, ))
 
         parameters = []
         # If the next Token is not the right parenthesis ')', there are parameters
@@ -108,7 +107,7 @@ class Parser:
         self._consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.")
 
         # Parse the body and wrap it in a function node
-        self._consume(TokenType.LEFT_BRACE, f"Expect '{{' before {kind} body.")
+        self._consume(TokenType.LEFT_BRACE, "Expect '{' before %s body." % kind)
         body = self._block()
         return Function(name=name, params=parameters, body=body)
 

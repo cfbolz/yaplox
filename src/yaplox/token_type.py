@@ -1,61 +1,65 @@
-import enum
+counter = 0
+def auto():
+    global counter
+    res = counter
+    counter += 1
+    return res
 
-
-class TokenType(enum.Enum):
+class TokenType(object):
     """
-    Tokens that are used in the Language. The mapping from Enum to character
+    Tokens that are used in the Language. The mapping from number to character
     will be done in the scanner.
     """
 
     #
     # Single - character tokens.
     #
-    LEFT_PAREN = enum.auto()
-    RIGHT_PAREN = enum.auto()
-    LEFT_BRACE = enum.auto()
-    RIGHT_BRACE = enum.auto()
-    COMMA = enum.auto()
-    DOT = enum.auto()
-    MINUS = enum.auto()
-    PLUS = enum.auto()
-    SEMICOLON = enum.auto()
-    SLASH = enum.auto()
-    STAR = enum.auto()
+    LEFT_PAREN = auto()
+    RIGHT_PAREN = auto()
+    LEFT_BRACE = auto()
+    RIGHT_BRACE = auto()
+    COMMA = auto()
+    DOT = auto()
+    MINUS = auto()
+    PLUS = auto()
+    SEMICOLON = auto()
+    SLASH = auto()
+    STAR = auto()
     #
     # One or two character tokens.
     #
-    BANG = enum.auto()
-    BANG_EQUAL = enum.auto()
-    EQUAL = enum.auto()
-    EQUAL_EQUAL = enum.auto()
-    GREATER = enum.auto()
-    GREATER_EQUAL = enum.auto()
-    LESS = enum.auto()
-    LESS_EQUAL = enum.auto()
+    BANG = auto()
+    BANG_EQUAL = auto()
+    EQUAL = auto()
+    EQUAL_EQUAL = auto()
+    GREATER = auto()
+    GREATER_EQUAL = auto()
+    LESS = auto()
+    LESS_EQUAL = auto()
     #
     # Literals.
     #
-    IDENTIFIER = enum.auto()
-    STRING = enum.auto()
-    NUMBER = enum.auto()
+    IDENTIFIER = auto()
+    STRING = auto()
+    NUMBER = auto()
     #
     # Keywords.
     #
-    AND = enum.auto()
-    CLASS = enum.auto()
-    ELSE = enum.auto()
-    FALSE = enum.auto()
-    FUN = enum.auto()
-    FOR = enum.auto()
-    IF = enum.auto()
-    NIL = enum.auto()
-    OR = enum.auto()
-    PRINT = enum.auto()
-    RETURN = enum.auto()
-    SUPER = enum.auto()
-    THIS = enum.auto()
-    TRUE = enum.auto()
-    VAR = enum.auto()
-    WHILE = enum.auto()
+    AND = auto()
+    CLASS = auto()
+    ELSE = auto()
+    FALSE = auto()
+    FUN = auto()
+    FOR = auto()
+    IF = auto()
+    NIL = auto()
+    OR = auto()
+    PRINT = auto()
+    RETURN = auto()
+    SUPER = auto()
+    THIS = auto()
+    TRUE = auto()
+    VAR = auto()
+    WHILE = auto()
 
-    EOF = enum.auto()
+    EOF = auto()

@@ -1,9 +1,6 @@
 import sys
 
-from structlog import get_logger
 
-from yaplox.__version__ import __version__
-from yaplox.config import config  # noqa: F401
 from yaplox.interpreter import Interpreter
 from yaplox.parser import Parser
 from yaplox.resolver import Resolver
@@ -12,7 +9,6 @@ from yaplox.token import Token
 from yaplox.token_type import TokenType
 from yaplox.yaplox_runtime_error import YaploxRuntimeError
 
-logger = get_logger()
 
 
 class Yaplox:
@@ -22,26 +18,22 @@ class Yaplox:
         self.interpreter  = Interpreter()
 
     def run(self, source ):
-        logger.debug("Running line", source=source)
 
         scanner = Scanner(source, on_error=self.error)
         tokens = scanner.scan_tokens()
-
-        for token in tokens:
-            logger.debug("Running token", token=token)
 
         parser = Parser(tokens, on_token_error=self.token_error)
         statements = parser.parse()
 
         if self.had_error:
-            logger.debug("Error after parsing")
+            print("Error after parsing")
             return
 
         resolver = Resolver(interpreter=self.interpreter, on_error=self.token_error)
         resolver.resolve(statements)
         # Stop if there was a resolution error.
         if self.had_error:
-            logger.debug("Error after resolving")
+            print("Error after resolving")
             return
 
         self.interpreter.interpret(statements, on_error=self.runtime_error)
@@ -50,21 +42,19 @@ class Yaplox:
         self.report(line, "", message)
 
     def runtime_error(self, error ):
-        message = f"{str(error.message)} in line [line{error.token.line}]"
-        logger.warning(message)
-        print(message, file=sys.stderr)
+        message = "%s in line [line%s]" % (str(error.message), error.token.line)
+        print(message)
         self.had_runtime_error = True
 
     def token_error(self, token , message ):
         if token.token_type == TokenType.EOF:
             self.report(token.line, " At end ", message)
         else:
-            self.report(token.line, f" at '{token.lexeme}'", message)
+            self.report(token.line, " at '%s'" % (token.lexeme, ), message)
 
     def report(self, line , where , message ):
-        message = f"[line {line}] Error {where} : {message}"
-        logger.warning(message)
-        print(message, file=sys.stderr)
+        message = "[line %s] Error %s : %s" % (line, where, message)
+        print(message)
         self.had_error = True
 
     @staticmethod
@@ -92,7 +82,7 @@ class Yaplox:
         """
         Run a REPL prompt. This prompt can be quit by pressing CTRL-C or CTRL-D
         """
-        print(f"Welcome to Yaplox {__version__}")
+        print("Welcome to Yaplox")
         print("Press CTRL-C or CTRL-D to exit")
 
         while True:
@@ -120,7 +110,7 @@ class Yaplox:
         executed, or no arguments to run in REPL mode.
         """
         if len(sys.argv) > 2:
-            print(f"Usage: {sys.argv[0]} [script]")
+            print("Usage: %s [script]" % (sys.argv[0], ))
             sys.exit(64)
         elif len(sys.argv) == 2:
             Yaplox().run_file(sys.argv[1])

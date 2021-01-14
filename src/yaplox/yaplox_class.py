@@ -1,13 +1,6 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
-
 from yaplox.yaplox_callable import YaploxCallable
 from yaplox.yaplox_function import YaploxFunction
 from yaplox.yaplox_instance import YaploxInstance
-
-if TYPE_CHECKING:
-    from yaplox.interpreter import Interpreter
 
 
 class YaploxClass(YaploxCallable):

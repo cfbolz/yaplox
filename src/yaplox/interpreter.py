@@ -1,6 +1,3 @@
-from typing import Any, Dict, List
-
-from structlog import get_logger
 
 from yaplox.clock import Clock
 from yaplox.environment import Environment
@@ -42,7 +39,6 @@ from yaplox.yaplox_instance import YaploxInstance
 from yaplox.yaplox_return_exception import YaploxReturnException
 from yaplox.yaplox_runtime_error import YaploxRuntimeError
 
-logger = get_logger()
 
 
 class Interpreter(ExprVisitor, StmtVisitor):
@@ -57,7 +53,6 @@ class Interpreter(ExprVisitor, StmtVisitor):
         try:
             res = None
             for statement in statements:
-                logger.debug("Executing", statement=statement)
                 res = self._execute(statement)
             # The return in the interpreter is not default Lox. It's added for now
             # to make testing and debugging easier.
@@ -79,7 +74,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
         if isinstance(obj, float):
             # Print floats and remove trailing zero's, and if the dot is at the right
             # part, remove it too. Decimal precision is set to 6 positions
-            return f"{obj:0.6f}".rstrip("0").rstrip(".")
+            return str(obj)
 
         return str(obj)
 
@@ -148,7 +143,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
         except KeyError:
             raise YaploxRuntimeError(
-                expr.operator, f"Unknown operator {expr.operator.lexeme}"
+                expr.operator, "Unknown operator %s" % (expr.operator.lexeme, )
             )
 
     def visit_call_expr(self, expr ):
@@ -163,7 +158,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
         if len(arguments) != function.arity():
             raise YaploxRuntimeError(
                 expr.paren,
-                f"Expected {function.arity()} arguments but got {len(arguments)}.",
+                "Expected %s arguments but got %s." % (function.arity(), len(arguments)),
             )
         return function.call(self, arguments)
 
@@ -211,7 +206,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
         # Check that we have a super method
         if method is None:
             raise YaploxRuntimeError(
-                expr.method, f"Undefined property '{expr.method.lexeme}'."
+                expr.method, "Undefined property '%s'." % (expr.method.lexeme, )
             )
         return method.bind(obj)
 
@@ -232,7 +227,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
     def _check_number_operand(operator , operand ):
         if isinstance(operand, (float, int)):
             return
-        raise YaploxRuntimeError(operator, f"{operand} must be a number.")
+        raise YaploxRuntimeError(operator, "%s must be a number." % (operand, ))
 
     @staticmethod
     def _check_number_operands(operator , left , right ):

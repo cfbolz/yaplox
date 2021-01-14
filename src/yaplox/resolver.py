@@ -1,7 +1,5 @@
 from collections import deque
-from typing import Deque, List
 
-from structlog import get_logger
 
 from yaplox.class_type import ClassType
 from yaplox.expr import (
@@ -37,7 +35,6 @@ from yaplox.stmt import (
 )
 from yaplox.token import Token
 
-logger = get_logger()
 
 
 class Resolver(ExprVisitor, StmtVisitor):

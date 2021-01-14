@@ -1,5 +1,3 @@
-from typing import Any
-
 from yaplox.token_type import TokenType
 
 
@@ -19,4 +17,4 @@ class Token:
         self.line = line
 
     def __repr__(self):
-        return f"{self.token_type} {self.lexeme} {self.literal}"
+        return "%s %s %s" % (self.token_type, self.lexeme, self.literal)

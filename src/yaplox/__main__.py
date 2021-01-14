@@ -1,4 +1,4 @@
-from yaplox.yaplox import Yaplox
+from yaplox.main import Yaplox
 
 if __name__ == "__main__":
     Yaplox.main()
