@@ -12,7 +12,7 @@ class YaploxFunction(YaploxCallable):
         closure ,
         is_initializer ,
     ):
-        super().__init__()
+        YaploxCallable.__init__(self)
         self.closure = closure
         self.declaration = declaration
         self.is_initializer = is_initializer

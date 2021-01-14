@@ -16,12 +16,12 @@ class TestAstPrinter:
             expr.Grouping(expr.Literal(45.67)),
         )
 
-        result = AstPrinter().print(expression)
+        result = AstPrinter().prnt(expression)
         assert result == "(* (- 123) (group 45.67))"
 
     def test_astrinter_nill(self):
         # Test a single edge case None
         expression = expr.Literal(None)
 
-        result = AstPrinter().print(expression)
+        result = AstPrinter().prnt(expression)
         assert result == "nil"

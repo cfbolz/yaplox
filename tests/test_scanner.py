@@ -138,7 +138,7 @@ class TestScanner:
 
     def test_scanner_with_multiline_string(self, mocker):
         source = "This is an \nMulti-\nline-string"
-        source_input = f'"{source}"'
+        source_input = '"' + source + '"'
 
         on_error_mock = mocker.MagicMock()
         scanner = Scanner(source_input, on_error=on_error_mock)

@@ -10,5 +10,5 @@ class YaploxReturnException(YaploxRuntimeError):
     """
 
     def __init__(self, value):
-        super().__init__(None, None)
+        YaploxRuntimeError.__init__(self, None, None)
         self.value = value

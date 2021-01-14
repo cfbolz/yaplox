@@ -1,4 +1,4 @@
-from yaplox.yaplox import Yaplox
+from yaplox.main import Yaplox
 
 
 class TestFunctions:
@@ -99,10 +99,10 @@ class TestFunctions:
         assert captured.err == "Expected 2 arguments but got 1. in line [line6]\n"
 
     def test_too_many_parameters_in_definition(self, capsys):
-        parameters = ", ".join([f"arg_{n:03}" for n in range(256)])
+        parameters = ", ".join(["arg_%s" % (n, ) for n in range(256)])
 
         statement = [
-            f"fun sayHi({parameters}) {{",
+            "fun sayHi(%s) {{" % (parameters, ),
             '  print "Hi!";',
             "}",
         ]
@@ -124,9 +124,9 @@ class TestFunctions:
         )
 
     def test_too_many_arguments_in_call(self, capsys):
-        arguments = ", ".join([f"arg_{n:03}" for n in range(256)])
+        arguments = ", ".join(["arg_%s" % (n, ) for n in range(256)])
 
-        statement = ["fun sayHi() {", '  print "Hi!";', "}" "", f"sayHi({arguments});"]
+        statement = ["fun sayHi() {", '  print "Hi!";', "}" "", "sayHi(%s);" % (arguments, )]
 
         source = "\n".join(statement)
         yaplox = Yaplox()

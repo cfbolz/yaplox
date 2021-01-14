@@ -1,9 +1,8 @@
 import sys
-from unittest.mock import patch
 
 import pytest
 
-from yaplox.yaplox import Yaplox
+from yaplox.main import Yaplox
 
 
 class TestMain:
@@ -37,9 +36,9 @@ class TestMain:
             yaplox = Yaplox()
             yaplox.main()
 
-    def test_main_file_too_many_arg(self):
+    def test_main_file_too_many_arg(self, monkeypatch):
         # Must crash
-        with patch.object(sys, "argv", ["yaplox.py", "test2.lox", "test2.lox"]):
+        with monkeypatch.setattr(sys, "argv", ["yaplox.py", "test2.lox", "test2.lox"]):
             with pytest.raises(SystemExit) as pytest_wrapped_e:
                 yaplox = Yaplox()
                 yaplox.main()

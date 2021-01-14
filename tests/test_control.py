@@ -1,6 +1,6 @@
 from yaplox.parser import Parser
 from yaplox.scanner import Scanner
-from yaplox.yaplox import Yaplox
+from yaplox.main import Yaplox
 
 
 class TestControl:

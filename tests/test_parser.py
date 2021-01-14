@@ -54,7 +54,7 @@ class TestParser:
         # We can expand the whole tree by hand, or just simply convert it to
         # a string and validate that
 
-        ast = AstPrinter().print(expr)
+        ast = AstPrinter().prnt(expr)
         expected = (
             "(!= (!= (== (== (!= (* (group (+ 4.0 4.0)) (group (/ 1.0 4.0))) "
             "(- 3.0)) FOO) True) False) nil)"

@@ -55,7 +55,7 @@ class AstPrinter(ExprVisitor):
     def visit_variable_expr(self, expr ):
         raise NotImplementedError
 
-    def print(self, expr )  :
+    def prnt(self, expr )  :
         return expr.accept(self)
 
     def _parenthesize(self, name , *args ):

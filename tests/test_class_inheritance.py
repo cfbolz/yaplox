@@ -1,3 +1,4 @@
+# encoding: utf-8
 class TestClassesInheretance:
     def test_class_circular(self, run_code_block):
         line = "class Oops < Oops {}"

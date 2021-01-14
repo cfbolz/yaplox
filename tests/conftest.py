@@ -1,10 +1,8 @@
-from typing import List, Optional
-
 import pytest
 
 from yaplox.token import Token
 from yaplox.token_type import TokenType
-from yaplox.yaplox import Yaplox
+from yaplox.main import Yaplox
 
 
 @pytest.fixture
