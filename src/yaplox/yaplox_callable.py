@@ -1,4 +1,6 @@
-class YaploxCallable(object):
+from yaplox import obj
+
+class YaploxCallable(obj.W_Root):
     def call(self, interpreter , arguments ):
         raise NotImplementedError
 

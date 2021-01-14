@@ -39,7 +39,7 @@ from yaplox.token import Token
 class Resolver(EverythingVisitor):
     def __init__(self, interpreter , on_error=None):
         self.interpreter = interpreter
-        self.scopes  = deque()
+        self.scopes  = []
         self.on_error = on_error
         self.current_function = FunctionType.NONE
         self.current_class = ClassType.NONE
@@ -58,7 +58,10 @@ class Resolver(EverythingVisitor):
         expression.accept(self)
 
     def _resolve_local(self, expr , name ):
-        for idx, scope in enumerate(reversed(self.scopes)):
+        #for idx, scope in enumerate(reversed(self.scopes)):
+        for i in range(len(self.scopes) - 1, -1, -1):
+            idx = len(self.scopes) - 1 - i
+            scope = self.scopes[i]
             if name.lexeme in scope:
                 self.interpreter.resolve(expr, idx)
                 return
@@ -165,7 +168,7 @@ class Resolver(EverythingVisitor):
         self._resolve_expression(expr.right)
 
     def visit_variable_expr(self, expr ):
-        if len(self.scopes) != 0 and self.scopes[-1].get(expr.name.lexeme) is False:
+        if len(self.scopes) != 0 and self.scopes[-1].get(expr.name.lexeme, True) == False:
             self.on_error(
                 expr.name, "Cannot read local variable in its own initializer."
             )

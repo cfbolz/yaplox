@@ -1,6 +1,7 @@
 import time
 
 from yaplox.yaplox_callable import YaploxCallable
+from yaplox import obj
 
 
 class Clock(YaploxCallable):
@@ -16,7 +17,7 @@ class Clock(YaploxCallable):
         """
         Return the time in seconds since the epoch as a floating point number
         """
-        return time.time()
+        return obj.W_Number(time.time())
 
     def arity(self)  :
         """ "

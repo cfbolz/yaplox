@@ -35,7 +35,6 @@ class ParseError(Exception):
     def __init__(self, token, message):
         self.token = token
         self.message = message
-        Exception.__init__(self, message)
 
 
 class Parser:
@@ -398,11 +397,12 @@ class Parser:
         raise self._error(self._peek(), "Expect expression")
 
     def _match(self, *args )  :
-        for tokentype in args:
-            if self._check(tokentype):
-                self._advance()
-                return True
-        return False
+        if not args:
+            return False
+        if self._check(args[0]):
+            self._advance()
+            return True
+        return self._match(*args[1:])
 
     def _consume(self, token_type , message ):
         if self._check(token_type):

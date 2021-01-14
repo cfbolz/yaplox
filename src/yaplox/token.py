@@ -1,7 +1,7 @@
 from yaplox.token_type import TokenType
 
 
-class Token:
+class Token(object):
     """
     Store parsed tokens
     """

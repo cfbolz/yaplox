@@ -75,10 +75,11 @@ class Yaplox:
 
         # Indicate an error in the exit code
         if self.had_error:
-            sys.exit(65)
+            return 65
 
         if self.had_runtime_error:
-            sys.exit(70)
+            return 70
+        return 0
 
     def run_prompt(self):  # pragma: no cover
         """

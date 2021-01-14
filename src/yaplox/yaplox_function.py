@@ -25,7 +25,9 @@ class YaploxFunction(YaploxCallable):
     def call(self, interpreter, arguments):
         environment = Environment(self.closure)
 
-        for declared_token, argument in zip(self.declaration.params, arguments):
+        for i in range(len(self.declaration.params)):
+            declared_token = self.declaration.params[i]
+            argument = arguments[i]
             environment.define(declared_token.lexeme, argument)
         try:
             interpreter.execute_block(self.declaration.body, environment)

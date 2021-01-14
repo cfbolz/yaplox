@@ -81,8 +81,8 @@ class Interpreter(EverythingVisitor):
         if isinstance(left, obj.W_Number) and isinstance(right, obj.W_Number):
             return obj.W_Number(left.num + right.num)
 
-        if isinstance(left, str) and isinstance(right, str):
-            return obj.W_String(left.num + right.num)
+        if isinstance(left, obj.W_String) and isinstance(right, obj.W_String):
+            return obj.W_String(left.val + right.val)
 
         raise YaploxRuntimeError(
             expr.operator, "Operands must be two numbers or two strings"
@@ -208,7 +208,7 @@ class Interpreter(EverythingVisitor):
         elif token_type == TokenType.BANG:
             return obj.newbool(not Interpreter._is_truthy(right))
         else:
-            raise YaploxRuntimeError(operator, "unknown unary operator")
+            raise YaploxRuntimeError(expr.operator, "unknown unary operator")
 
 
     @staticmethod
@@ -240,16 +240,16 @@ class Interpreter(EverythingVisitor):
         return self._look_up_variable(expr.name, expr)
 
     def _look_up_variable(self, name , expr )  :
-        distance = self.locals.get(expr)
-        if distance is not None:
+        distance = self.locals.get(expr, -1)
+        if distance >= 0:
             return self.environment.get_at(distance, name.lexeme)
         else:
             return self.globals.get(name)
 
     def visit_assign_expr(self, expr )  :
         value = self._evaluate(expr.value)
-        distance = self.locals.get(expr)
-        if distance:
+        distance = self.locals.get(expr, -1)
+        if distance >= 0:
             self.environment.assign_at(distance, expr.name, value)
         else:
             self.globals.assign(expr.name, value)
