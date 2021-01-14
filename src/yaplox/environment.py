@@ -5,7 +5,7 @@ from yaplox.yaplox_runtime_error import YaploxRuntimeError
 
 class Environment:
     def __init__(self, enclosing  = None):
-        self.values   = dict()
+        self.values   = {}
         self.enclosing = enclosing
 
     def define(self, name , value ):

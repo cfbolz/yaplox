@@ -59,10 +59,12 @@ class Yaplox:
 
     @staticmethod
     def _load_file(file )  :  # pragma: no cover
-        with open(file) as f:
-            content = f.readlines()
-            lines = "\n".join(content)
-            return lines
+        f = open(file)
+        try:
+            content = f.read()
+        finally:
+            f.close()
+        return content
 
     def run_file(self, file ):  # pragma: no cover
         """

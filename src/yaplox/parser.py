@@ -28,6 +28,8 @@ from yaplox.stmt import (
 from yaplox.token import Token
 from yaplox.token_type import TokenType
 
+from yaplox import obj
+
 
 class ParseError(Exception):
     def __init__(self, token, message):
@@ -183,7 +185,7 @@ class Parser:
             body = Block([body, Expression(increment)])
 
         if condition is None:
-            condition = Literal(True)
+            condition = Literal(obj.w_true)
 
         body = While(condition, body)
 
@@ -360,16 +362,18 @@ class Parser:
 
     def _primary(self)  :
         if self._match(TokenType.FALSE):
-            return Literal(False)
+            return Literal(obj.w_false)
 
         if self._match(TokenType.TRUE):
-            return Literal(True)
+            return Literal(obj.w_true)
 
         if self._match(TokenType.NIL):
-            return Literal(None)
+            return Literal(obj.w_nil)
 
-        if self._match(TokenType.NUMBER, TokenType.STRING):
-            return Literal(self._previous().literal)
+        if self._match(TokenType.NUMBER):
+            return Literal(obj.W_Number(float(self._previous().literal)))
+        if self._match(TokenType.STRING):
+            return Literal(obj.W_String(self._previous().literal))
 
         if self._match(TokenType.SUPER):
             keyword = self._previous()

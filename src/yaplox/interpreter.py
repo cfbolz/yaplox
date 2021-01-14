@@ -6,7 +6,6 @@ from yaplox.expr import (
     Binary,
     Call,
     Expr,
-    ExprVisitor,
     Get,
     Grouping,
     Literal,
@@ -26,7 +25,7 @@ from yaplox.stmt import (
     Print,
     Return,
     Stmt,
-    StmtVisitor,
+    EverythingVisitor,
     Var,
     While,
 )
@@ -38,14 +37,15 @@ from yaplox.yaplox_function import YaploxFunction
 from yaplox.yaplox_instance import YaploxInstance
 from yaplox.yaplox_return_exception import YaploxReturnException
 from yaplox.yaplox_runtime_error import YaploxRuntimeError
+from yaplox import obj
 
 
 
-class Interpreter(ExprVisitor, StmtVisitor):
+class Interpreter(EverythingVisitor):
     def __init__(self):
         self.globals = Environment()
         self.environment = self.globals
-        self.locals = dict()
+        self.locals = {}
 
         self.globals.define("clock", Clock())
 
@@ -67,24 +67,22 @@ class Interpreter(ExprVisitor, StmtVisitor):
         self.locals[expr] = depth
 
     @staticmethod
-    def _stringify(obj)  :
-        if obj is None:
+    def _stringify(o)  :
+        if o is obj.w_nil:
             return "nil"
 
-        if isinstance(obj, float):
-            # Print floats and remove trailing zero's, and if the dot is at the right
-            # part, remove it too. Decimal precision is set to 6 positions
-            return str(obj)
+        if isinstance(o, obj.W_Number):
+            return str(o.num)
 
-        return str(obj)
+        return str(o)
 
     @staticmethod
     def _binary_plus(expr, left, right):
-        if isinstance(left, (float, int)) and isinstance(right, (float, int)):
-            return left + right
+        if isinstance(left, obj.W_Number) and isinstance(right, obj.W_Number):
+            return obj.W_Number(left.num + right.num)
 
         if isinstance(left, str) and isinstance(right, str):
-            return str(left + right)
+            return obj.W_String(left.num + right.num)
 
         raise YaploxRuntimeError(
             expr.operator, "Operands must be two numbers or two strings"
@@ -105,43 +103,30 @@ class Interpreter(ExprVisitor, StmtVisitor):
         right = self._evaluate(expr.right)
         token_type = expr.operator.token_type
 
-        # Validate that for the following Tokens the operands are numeric.
-        # Orginal jpox does this in a switch statement. Since python does not
-        # have this statement, the dict method is chosen. To not duplicate this line
-        # over and over, the check is done seperately.
-        if token_type in (
-            TokenType.GREATER,
-            TokenType.GREATER_EQUAL,
-            TokenType.LESS,
-            TokenType.LESS_EQUAL,
-            TokenType.MINUS,
-            TokenType.SLASH,
-            TokenType.STAR,
-        ):
-            self._check_number_operands(expr.operator, left, right)
-
-        choices = {
-            # Comparison operators
-            TokenType.GREATER: lambda: float(left) > float(right),
-            TokenType.GREATER_EQUAL: lambda: float(left) >= float(right),
-            TokenType.LESS: lambda: float(left) < float(right),
-            TokenType.LESS_EQUAL: lambda: float(left) <= float(right),
-            # Equality
-            TokenType.BANG_EQUAL: lambda: not self._is_equal(left, right),
-            TokenType.EQUAL_EQUAL: lambda: self._is_equal(left, right),
-            # Arithmetic operators
-            TokenType.MINUS: lambda: float(left) - float(right),
-            TokenType.SLASH: lambda: float(left) / float(right),
-            TokenType.STAR: lambda: float(left) * float(right),
-            TokenType.PLUS: lambda: self._binary_plus(expr, left, right),
-        }
-
-        try:
-            option = choices[token_type]
-            result = option()
-            return result
-
-        except KeyError:
+        if token_type == TokenType.GREATER:
+            leftval, rightval = self._check_number_operands(expr.operator, left, right)
+            return obj.newbool(leftval > rightval)
+        elif token_type == TokenType.GREATER_EQUAL:
+            leftval, rightval = self._check_number_operands(expr.operator, left, right)
+            return obj.newbool(leftval >= rightval)
+        elif token_type == TokenType.LESS:
+            leftval, rightval = self._check_number_operands(expr.operator, left, right)
+            return obj.newbool(leftval < rightval)
+        elif token_type == TokenType.LESS_EQUAL:
+            leftval, rightval = self._check_number_operands(expr.operator, left, right)
+            return obj.newbool(leftval <= rightval)
+        elif token_type == TokenType.MINUS:
+            leftval, rightval = self._check_number_operands(expr.operator, left, right)
+            return obj.W_Number(leftval - rightval)
+        elif token_type == TokenType.SLASH:
+            leftval, rightval = self._check_number_operands(expr.operator, left, right)
+            return obj.W_Number(leftval / rightval)
+        elif token_type == TokenType.STAR:
+            leftval, rightval = self._check_number_operands(expr.operator, left, right)
+            return obj.W_Number(leftval * rightval)
+        elif token_type == TokenType.PLUS:
+            return self._binary_plus(expr, left, right)
+        else:
             raise YaploxRuntimeError(
                 expr.operator, "Unknown operator %s" % (expr.operator.lexeme, )
             )
@@ -218,30 +203,33 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
         token_type = expr.operator.token_type
         if token_type == TokenType.MINUS:
-            self._check_number_operand(expr.operator, right)
-            return -float(right)
+            rightval = self._check_number_operand(expr.operator, right)
+            return obj.W_Number(-rightval)
         elif token_type == TokenType.BANG:
-            return not Interpreter._is_truthy(right)
+            return obj.newbool(not Interpreter._is_truthy(right))
+        else:
+            raise YaploxRuntimeError(operator, "unknown unary operator")
+
 
     @staticmethod
     def _check_number_operand(operator , operand ):
-        if isinstance(operand, (float, int)):
-            return
+        if isinstance(operand, obj.W_Number):
+            return operand.num
         raise YaploxRuntimeError(operator, "%s must be a number." % (operand, ))
 
     @staticmethod
     def _check_number_operands(operator , left , right ):
-        if isinstance(left, (float, int)) and isinstance(right, (float, int)):
-            return
+        if isinstance(left, obj.W_Number) and isinstance(right, obj.W_Number):
+            return left.num, right.num
         raise YaploxRuntimeError(operator, "Operands must be numbers.")
 
     @staticmethod
-    def _is_truthy(obj):
-        if obj is None:
+    def _is_truthy(o):
+        if o is obj.w_nil:
             return False
 
-        if isinstance(obj, bool):
-            return obj
+        if o is obj.w_false:
+            return False
 
         return True
 

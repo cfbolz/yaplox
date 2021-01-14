@@ -73,7 +73,9 @@ class Scanner:
         self._advance()
 
         # Trim the surrounding "
-        string_value = self.source[self.start + 1 : self.current - 1]
+        end = self.current - 1
+        assert end >= 0
+        string_value = self.source[self.start + 1 : end]
         self._add_token(TokenType.STRING, string_value)
 
     def _number(self):
@@ -89,7 +91,7 @@ class Scanner:
                 self._advance()
 
         number_value = self.source[self.start : self.current]
-        self._add_token(TokenType.NUMBER, float(number_value))
+        self._add_token(TokenType.NUMBER, number_value)
 
     def _identifier(self):
         while self._peek().isalnum() or self._peek() == "_":
@@ -109,39 +111,8 @@ class Scanner:
         # statement. Python does not have this construct (yet), the closest thing is an
         # dict:
 
-        token_options = {
-            "(": lambda: self._add_token(TokenType.LEFT_PAREN),
-            ")": lambda: self._add_token(TokenType.RIGHT_PAREN),
-            "{": lambda: self._add_token(TokenType.LEFT_BRACE),
-            "}": lambda: self._add_token(TokenType.RIGHT_BRACE),
-            ",": lambda: self._add_token(TokenType.COMMA),
-            ".": lambda: self._add_token(TokenType.DOT),
-            "-": lambda: self._add_token(TokenType.MINUS),
-            "+": lambda: self._add_token(TokenType.PLUS),
-            ";": lambda: self._add_token(TokenType.SEMICOLON),
-            "*": lambda: self._add_token(TokenType.STAR),
-            "!": lambda: self._add_token(
-                TokenType.BANG_EQUAL if self._match("=") else TokenType.BANG
-            ),
-            "=": lambda: self._add_token(
-                TokenType.EQUAL_EQUAL if self._match("=") else TokenType.EQUAL
-            ),
-            "<": lambda: self._add_token(
-                TokenType.LESS_EQUAL if self._match("=") else TokenType.LESS
-            ),
-            ">": lambda: self._add_token(
-                TokenType.GREATER_EQUAL if self._match("=") else TokenType.GREATER
-            ),
-            "/": self._operator_slash,
-            " ": lambda: None,
-            "\r": lambda: None,
-            "\t": lambda: None,
-            "\n": self._operator_newline,
-            '"': self._string,
-        }  # type: Dict[str, Callable]
-
         try:
-            token_options[c]()
+            token_options[c](self)
         except KeyError:
             # This is the 'default' case in the Java switch statement
             if c.isdigit():
@@ -198,3 +169,35 @@ class Scanner:
         self.current += 1
 
         return True
+
+token_options = {
+    "(": lambda self: self._add_token(TokenType.LEFT_PAREN),
+    ")": lambda self: self._add_token(TokenType.RIGHT_PAREN),
+    "{": lambda self: self._add_token(TokenType.LEFT_BRACE),
+    "}": lambda self: self._add_token(TokenType.RIGHT_BRACE),
+    ",": lambda self: self._add_token(TokenType.COMMA),
+    ".": lambda self: self._add_token(TokenType.DOT),
+    "-": lambda self: self._add_token(TokenType.MINUS),
+    "+": lambda self: self._add_token(TokenType.PLUS),
+    ";": lambda self: self._add_token(TokenType.SEMICOLON),
+    "*": lambda self: self._add_token(TokenType.STAR),
+    "!": lambda self: self._add_token(
+    TokenType.BANG_EQUAL if self._match("=") else TokenType.BANG
+    ),
+    "=": lambda self: self._add_token(
+        TokenType.EQUAL_EQUAL if self._match("=") else TokenType.EQUAL
+    ),
+    "<": lambda self: self._add_token(
+        TokenType.LESS_EQUAL if self._match("=") else TokenType.LESS
+    ),
+    ">": lambda self: self._add_token(
+        TokenType.GREATER_EQUAL if self._match("=") else TokenType.GREATER
+    ),
+    "/": Scanner._operator_slash,
+    " ": lambda self: None,
+    "\r": lambda self: None,
+    "\t": lambda self: None,
+    "\n": Scanner._operator_newline,
+    '"': Scanner._string,
+}  # type: Dict[str, Callable]
+

@@ -43,10 +43,13 @@ class ExprVisitor(object):
     def visit_variable_expr(self, expr ):
         raise NotImplementedError
 
-
-class Expr(object):
+class Base(object):
     def accept(self, visitor ):
         raise NotImplementedError
+
+
+class Expr(Base):
+    pass
 
 
 class Assign(Expr):

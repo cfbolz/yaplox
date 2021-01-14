@@ -7,7 +7,6 @@ from yaplox.expr import (
     Binary,
     Call,
     Expr,
-    ExprVisitor,
     Get,
     Grouping,
     Literal,
@@ -29,7 +28,7 @@ from yaplox.stmt import (
     Print,
     Return,
     Stmt,
-    StmtVisitor,
+    EverythingVisitor,
     Var,
     While,
 )
@@ -37,7 +36,7 @@ from yaplox.token import Token
 
 
 
-class Resolver(ExprVisitor, StmtVisitor):
+class Resolver(EverythingVisitor):
     def __init__(self, interpreter , on_error=None):
         self.interpreter = interpreter
         self.scopes  = deque()

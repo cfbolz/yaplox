@@ -1,8 +1,9 @@
 from yaplox.token import Token
 from yaplox.yaplox_runtime_error import YaploxRuntimeError
+from yaplox.obj import W_Root
 
 
-class YaploxInstance(object):
+class YaploxInstance(W_Root):
     def __init__(self, klass ):
         self.klass = klass
         self.fields   = {}
