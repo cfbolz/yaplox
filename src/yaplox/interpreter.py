@@ -1,3 +1,4 @@
+from rpython.rlib import jit
 
 from yaplox.clock import Clock
 from yaplox.environment import Environment

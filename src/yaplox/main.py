@@ -17,6 +17,26 @@ class Yaplox:
         self.had_runtime_error  = False
         self.interpreter  = Interpreter()
 
+    def uptoresolve(self, source ):
+
+        scanner = Scanner(source, on_error=self.error)
+        tokens = scanner.scan_tokens()
+
+        parser = Parser(tokens, on_token_error=self.token_error)
+        statements = parser.parse()
+
+        if self.had_error:
+            print("Error after parsing")
+            return
+
+        resolver = Resolver(interpreter=self.interpreter, on_error=self.token_error)
+        resolver.resolve(statements)
+        # Stop if there was a resolution error.
+        if self.had_error:
+            print("Error after resolving")
+            return
+        return statements
+
     def run(self, source ):
 
         scanner = Scanner(source, on_error=self.error)
