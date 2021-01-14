@@ -11,9 +11,9 @@ if TYPE_CHECKING:
 
 class YaploxCallable(ABC):
     @abstractmethod
-    def call(self, interpreter: Interpreter, arguments: List[Any]):
+    def call(self, interpreter , arguments ):
         raise NotImplementedError
 
     @abstractmethod
-    def arity(self) -> int:
+    def arity(self)  :
         raise NotImplementedError

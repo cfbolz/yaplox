@@ -5,10 +5,10 @@ from yaplox.token_type import TokenType
 
 
 class Scanner:
-    tokens: List
-    start: int = 0
-    current: int = 0
-    line: int = 1
+    #tokens: List
+    start  = 0
+    current  = 0
+    line  = 1
     keywords = {
         "and": TokenType.AND,
         "class": TokenType.CLASS,
@@ -28,7 +28,7 @@ class Scanner:
         "while": TokenType.WHILE,
     }
 
-    def __init__(self, source: str, on_error=None):
+    def __init__(self, source , on_error=None):
         """
         Create a new scanner that will scan the variable 'source'.
         'on_error' will be called when we encounter an error.
@@ -37,7 +37,7 @@ class Scanner:
         self.on_error = on_error
         self.tokens = []
 
-    def scan_tokens(self) -> List[Token]:
+    def scan_tokens(self)  :
         while not self._is_at_end():
             # We are at the beginning of the next lexeme.
             self.start = self.current
@@ -180,7 +180,7 @@ class Scanner:
             return "\0"
         return self.source[self.current + 1]
 
-    def _add_token(self, token_type: TokenType, literal: Any = None):
+    def _add_token(self, token_type , literal  = None):
         """
         In the java implementation this method is overloaded and depending on the
         literal parameter being there, or not. Because python doesn't have this
@@ -195,7 +195,7 @@ class Scanner:
             Token(token_type=token_type, lexeme=text, literal=literal, line=self.line)
         )
 
-    def _match(self, expected: str):
+    def _match(self, expected ):
         if self._is_at_end():
             return False
         if self.source[self.current] != expected:

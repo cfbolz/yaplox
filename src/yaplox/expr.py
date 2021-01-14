@@ -13,175 +13,175 @@ class ExprVisitor(ABC):
     """This class is used as an Vistor for the Expr class"""
 
     @abstractmethod
-    def visit_assign_expr(self, expr: Assign):
+    def visit_assign_expr(self, expr ):
         raise NotImplementedError
 
     @abstractmethod
-    def visit_binary_expr(self, expr: Binary):
+    def visit_binary_expr(self, expr ):
         raise NotImplementedError
 
     @abstractmethod
-    def visit_call_expr(self, expr: Call):
+    def visit_call_expr(self, expr ):
         raise NotImplementedError
 
     @abstractmethod
-    def visit_get_expr(self, expr: Get):
+    def visit_get_expr(self, expr ):
         raise NotImplementedError
 
     @abstractmethod
-    def visit_grouping_expr(self, expr: Grouping):
+    def visit_grouping_expr(self, expr ):
         raise NotImplementedError
 
     @abstractmethod
-    def visit_literal_expr(self, expr: Literal):
+    def visit_literal_expr(self, expr ):
         raise NotImplementedError
 
     @abstractmethod
-    def visit_logical_expr(self, expr: Logical):
+    def visit_logical_expr(self, expr ):
         raise NotImplementedError
 
     @abstractmethod
-    def visit_set_expr(self, expr: Set):
+    def visit_set_expr(self, expr ):
         raise NotImplementedError
 
     @abstractmethod
-    def visit_super_expr(self, expr: Super):
+    def visit_super_expr(self, expr ):
         raise NotImplementedError
 
     @abstractmethod
-    def visit_this_expr(self, expr: This):
+    def visit_this_expr(self, expr ):
         raise NotImplementedError
 
     @abstractmethod
-    def visit_unary_expr(self, expr: Unary):
+    def visit_unary_expr(self, expr ):
         raise NotImplementedError
 
     @abstractmethod
-    def visit_variable_expr(self, expr: Variable):
+    def visit_variable_expr(self, expr ):
         raise NotImplementedError
 
 
 class Expr(ABC):
     @abstractmethod
-    def accept(self, visitor: ExprVisitor):
+    def accept(self, visitor ):
         raise NotImplementedError
 
 
 class Assign(Expr):
-    def __init__(self, name: Token, value: Expr):
+    def __init__(self, name , value ):
         self.name = name
         self.value = value
 
-    def accept(self, visitor: ExprVisitor):
+    def accept(self, visitor ):
         """ Create a accept method that calls the visitor. """
         return visitor.visit_assign_expr(self)
 
 
 class Binary(Expr):
-    def __init__(self, left: Expr, operator: Token, right: Expr):
+    def __init__(self, left , operator , right ):
         self.left = left
         self.operator = operator
         self.right = right
 
-    def accept(self, visitor: ExprVisitor):
+    def accept(self, visitor ):
         """ Create a accept method that calls the visitor. """
         return visitor.visit_binary_expr(self)
 
 
 class Call(Expr):
-    def __init__(self, callee: Expr, paren: Token, arguments: List[Expr]):
+    def __init__(self, callee , paren , arguments ):
         self.callee = callee
         self.paren = paren
         self.arguments = arguments
 
-    def accept(self, visitor: ExprVisitor):
+    def accept(self, visitor ):
         """ Create a accept method that calls the visitor. """
         return visitor.visit_call_expr(self)
 
 
 class Get(Expr):
-    def __init__(self, obj: Expr, name: Token):
+    def __init__(self, obj , name ):
         self.obj = obj
         self.name = name
 
-    def accept(self, visitor: ExprVisitor):
+    def accept(self, visitor ):
         """ Create a accept method that calls the visitor. """
         return visitor.visit_get_expr(self)
 
 
 class Grouping(Expr):
-    def __init__(self, expression: Expr):
+    def __init__(self, expression ):
         self.expression = expression
 
-    def accept(self, visitor: ExprVisitor):
+    def accept(self, visitor ):
         """ Create a accept method that calls the visitor. """
         return visitor.visit_grouping_expr(self)
 
 
 class Literal(Expr):
-    def __init__(self, value: Any):
+    def __init__(self, value ):
         self.value = value
 
-    def accept(self, visitor: ExprVisitor):
+    def accept(self, visitor ):
         """ Create a accept method that calls the visitor. """
         return visitor.visit_literal_expr(self)
 
 
 class Logical(Expr):
-    def __init__(self, left: Expr, operator: Token, right: Expr):
+    def __init__(self, left , operator , right ):
         self.left = left
         self.operator = operator
         self.right = right
 
-    def accept(self, visitor: ExprVisitor):
+    def accept(self, visitor ):
         """ Create a accept method that calls the visitor. """
         return visitor.visit_logical_expr(self)
 
 
 class Set(Expr):
-    def __init__(self, obj: Expr, name: Token, value: Expr):
+    def __init__(self, obj , name , value ):
         self.obj = obj
         self.name = name
         self.value = value
 
-    def accept(self, visitor: ExprVisitor):
+    def accept(self, visitor ):
         """ Create a accept method that calls the visitor. """
         return visitor.visit_set_expr(self)
 
 
 class Super(Expr):
-    def __init__(self, keyword: Token, method: Token):
+    def __init__(self, keyword , method ):
         self.keyword = keyword
         self.method = method
 
-    def accept(self, visitor: ExprVisitor):
+    def accept(self, visitor ):
         """ Create a accept method that calls the visitor. """
         return visitor.visit_super_expr(self)
 
 
 class This(Expr):
-    def __init__(self, keyword: Token):
+    def __init__(self, keyword ):
         self.keyword = keyword
 
-    def accept(self, visitor: ExprVisitor):
+    def accept(self, visitor ):
         """ Create a accept method that calls the visitor. """
         return visitor.visit_this_expr(self)
 
 
 class Unary(Expr):
-    def __init__(self, operator: Token, right: Expr):
+    def __init__(self, operator , right ):
         self.operator = operator
         self.right = right
 
-    def accept(self, visitor: ExprVisitor):
+    def accept(self, visitor ):
         """ Create a accept method that calls the visitor. """
         return visitor.visit_unary_expr(self)
 
 
 class Variable(Expr):
-    def __init__(self, name: Token):
+    def __init__(self, name ):
         self.name = name
 
-    def accept(self, visitor: ExprVisitor):
+    def accept(self, visitor ):
         """ Create a accept method that calls the visitor. """
         return visitor.visit_variable_expr(self)

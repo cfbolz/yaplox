@@ -17,48 +17,48 @@ from yaplox.expr import (
 
 
 class AstPrinter(ExprVisitor):
-    def visit_assign_expr(self, expr: Assign):
+    def visit_assign_expr(self, expr ):
         raise NotImplementedError
 
-    def visit_binary_expr(self, expr: Binary):
+    def visit_binary_expr(self, expr ):
         return self._parenthesize(expr.operator.lexeme, expr.left, expr.right)
 
-    def visit_call_expr(self, expr: Call):
+    def visit_call_expr(self, expr ):
         raise NotImplementedError
 
-    def visit_get_expr(self, expr: Get):
+    def visit_get_expr(self, expr ):
         pass
 
-    def visit_grouping_expr(self, expr: Grouping):
+    def visit_grouping_expr(self, expr ):
         return self._parenthesize("group", expr.expression)
 
-    def visit_literal_expr(self, expr: Literal):
+    def visit_literal_expr(self, expr ):
         if expr.value is None:
             return "nil"
         return str(expr.value)
 
-    def visit_logical_expr(self, expr: Logical):
+    def visit_logical_expr(self, expr ):
         raise NotImplementedError
 
-    def visit_set_expr(self, expr: Set):
+    def visit_set_expr(self, expr ):
         pass
 
-    def visit_super_expr(self, expr: Super):
+    def visit_super_expr(self, expr ):
         pass
 
-    def visit_this_expr(self, expr: This):
+    def visit_this_expr(self, expr ):
         pass
 
-    def visit_unary_expr(self, expr: Unary):
+    def visit_unary_expr(self, expr ):
         return self._parenthesize(expr.operator.lexeme, expr.right)
 
-    def visit_variable_expr(self, expr: Variable):
+    def visit_variable_expr(self, expr ):
         raise NotImplementedError
 
-    def print(self, expr: Expr) -> str:
+    def print(self, expr )  :
         return expr.accept(self)
 
-    def _parenthesize(self, name: str, *args: Expr):
+    def _parenthesize(self, name , *args ):
         expressions = ["(", name]
 
         for expr in args:

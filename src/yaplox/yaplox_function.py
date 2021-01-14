@@ -10,16 +10,16 @@ from yaplox.yaplox_return_exception import YaploxReturnException
 class YaploxFunction(YaploxCallable):
     def __init__(
         self,
-        declaration: Function,
-        closure: Environment,
-        is_initializer: bool,
+        declaration ,
+        closure ,
+        is_initializer ,
     ):
         super().__init__()
         self.closure = closure
         self.declaration = declaration
         self.is_initializer = is_initializer
 
-    def bind(self, instance: YaploxInstance) -> YaploxFunction:
+    def bind(self, instance )  :
         environment = Environment(self.closure)
         environment.define("this", instance)
         return YaploxFunction(self.declaration, environment, self.is_initializer)
@@ -41,7 +41,7 @@ class YaploxFunction(YaploxCallable):
             # When init() is called directly on a class
             return self.closure.get_at(0, "this")
 
-    def arity(self) -> int:
+    def arity(self)  :
         return len(self.declaration.params)
 
     def __str__(self):

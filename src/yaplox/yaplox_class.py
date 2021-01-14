@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 class YaploxClass(YaploxCallable):
-    def call(self, interpreter: Interpreter, arguments: List[Any]):
+    def call(self, interpreter , arguments ):
         instance = YaploxInstance(klass=self)
         initializer = self.find_method("init")
         if initializer is not None:
@@ -20,7 +20,7 @@ class YaploxClass(YaploxCallable):
             )
         return instance
 
-    def arity(self) -> int:
+    def arity(self)  :
         initializer = self.find_method("init")
         if initializer is not None:
             return initializer.arity()
@@ -29,9 +29,9 @@ class YaploxClass(YaploxCallable):
 
     def __init__(
         self,
-        name: str,
-        superclass: Optional[YaploxClass],
-        methods: Dict[str, YaploxFunction],
+        name ,
+        superclass ,
+        methods  ,
     ):
         self.name = name
         self.superclass = superclass
@@ -40,7 +40,7 @@ class YaploxClass(YaploxCallable):
     def __repr__(self):
         return self.name
 
-    def find_method(self, name: str) -> Optional[YaploxFunction]:
+    def find_method(self, name )  :
         try:
             return self.methods[name]
         except KeyError:

@@ -41,34 +41,34 @@ logger = get_logger()
 
 
 class Resolver(ExprVisitor, StmtVisitor):
-    def __init__(self, interpreter: Interpreter, on_error=None):
+    def __init__(self, interpreter , on_error=None):
         self.interpreter = interpreter
-        self.scopes: Deque = deque()
+        self.scopes  = deque()
         self.on_error = on_error
         self.current_function = FunctionType.NONE
         self.current_class = ClassType.NONE
 
-    def resolve(self, statements: List[Stmt]):
+    def resolve(self, statements ):
         self._resolve_statements(statements)
 
-    def _resolve_statements(self, statements: List[Stmt]):
+    def _resolve_statements(self, statements ):
         for statement in statements:
             self._resolve_statement(statement)
 
-    def _resolve_statement(self, statement: Stmt):
+    def _resolve_statement(self, statement ):
         statement.accept(self)
 
-    def _resolve_expression(self, expression: Expr):
+    def _resolve_expression(self, expression ):
         expression.accept(self)
 
-    def _resolve_local(self, expr: Expr, name: Token):
+    def _resolve_local(self, expr , name ):
         for idx, scope in enumerate(reversed(self.scopes)):
             if name.lexeme in scope:
                 self.interpreter.resolve(expr, idx)
                 return
         # Not found. Assume it is global.
 
-    def _resolve_function(self, function: Function, type: FunctionType):
+    def _resolve_function(self, function , type ):
         enclosing_function = self.current_function
         self.current_function = type
 
@@ -87,7 +87,7 @@ class Resolver(ExprVisitor, StmtVisitor):
     def _end_scope(self):
         self.scopes.pop()
 
-    def _declare(self, name: Token):
+    def _declare(self, name ):
         """
         Declare that a variable exists
         Example is `var a;`
@@ -102,7 +102,7 @@ class Resolver(ExprVisitor, StmtVisitor):
 
         scope[name.lexeme] = False
 
-    def _define(self, name: Token):
+    def _define(self, name ):
         """
         Declare that a variable is ready to use
         Example: `a = 42;`
@@ -114,48 +114,48 @@ class Resolver(ExprVisitor, StmtVisitor):
         scope = self.scopes[-1]
         scope[name.lexeme] = True
 
-    def visit_assign_expr(self, expr: Assign):
+    def visit_assign_expr(self, expr ):
         self._resolve_expression(expr.value)
         self._resolve_local(expr, expr.name)
 
-    def visit_binary_expr(self, expr: Binary):
+    def visit_binary_expr(self, expr ):
         self._resolve_expression(expr.left)
         self._resolve_expression(expr.right)
 
-    def visit_call_expr(self, expr: Call):
+    def visit_call_expr(self, expr ):
         self._resolve_expression(expr.callee)
 
         for argument in expr.arguments:
             self._resolve_expression(argument)
 
-    def visit_get_expr(self, expr: Get):
+    def visit_get_expr(self, expr ):
         self._resolve_expression(expr.obj)
 
-    def visit_grouping_expr(self, expr: Grouping):
+    def visit_grouping_expr(self, expr ):
         self._resolve_expression(expr.expression)
 
-    def visit_literal_expr(self, expr: Literal):
+    def visit_literal_expr(self, expr ):
         """
         Since a literal expression doesn't mention any variables and doesn't
         contain any subexpressions, there is no work to do.
         """
         return
 
-    def visit_logical_expr(self, expr: Logical):
+    def visit_logical_expr(self, expr ):
         self._resolve_expression(expr.left)
         self._resolve_expression(expr.right)
 
-    def visit_this_expr(self, expr: This):
+    def visit_this_expr(self, expr ):
         if self.current_class == ClassType.NONE:
             self.on_error(expr.keyword, "Can't use 'this' outside of a class.")
 
         self._resolve_local(expr, expr.keyword)
 
-    def visit_set_expr(self, expr: Set):
+    def visit_set_expr(self, expr ):
         self._resolve_expression(expr.value)
         self._resolve_expression(expr.obj)
 
-    def visit_super_expr(self, expr: Super):
+    def visit_super_expr(self, expr ):
         if self.current_class == ClassType.NONE:
             self.on_error(expr.keyword, "Can't use 'super' outside of a class.")
         elif self.current_class != ClassType.SUBCLASS:
@@ -165,22 +165,22 @@ class Resolver(ExprVisitor, StmtVisitor):
 
         self._resolve_local(expr, expr.keyword)
 
-    def visit_unary_expr(self, expr: Unary):
+    def visit_unary_expr(self, expr ):
         self._resolve_expression(expr.right)
 
-    def visit_variable_expr(self, expr: Variable):
+    def visit_variable_expr(self, expr ):
         if len(self.scopes) != 0 and self.scopes[-1].get(expr.name.lexeme) is False:
             self.on_error(
                 expr.name, "Cannot read local variable in its own initializer."
             )
         self._resolve_local(expr, expr.name)
 
-    def visit_block_stmt(self, stmt: Block):
+    def visit_block_stmt(self, stmt ):
         self._begin_scope()
         self._resolve_statements(stmt.statements)
         self._end_scope()
 
-    def visit_class_stmt(self, stmt: Class):
+    def visit_class_stmt(self, stmt ):
         enclosing_class = self.current_class
         self.current_class = ClassType.CLASS
 
@@ -215,25 +215,25 @@ class Resolver(ExprVisitor, StmtVisitor):
 
         self.current_class = enclosing_class
 
-    def visit_expression_stmt(self, stmt: Expression):
+    def visit_expression_stmt(self, stmt ):
         self._resolve_expression(stmt.expression)
 
-    def visit_function_stmt(self, stmt: Function):
+    def visit_function_stmt(self, stmt ):
         self._declare(stmt.name)
         self._define(stmt.name)
 
         self._resolve_function(stmt, FunctionType.FUNCTION)
 
-    def visit_if_stmt(self, stmt: If):
+    def visit_if_stmt(self, stmt ):
         self._resolve_expression(stmt.condition)
         self._resolve_statement(stmt.then_branch)
         if stmt.else_branch:
             self._resolve_statement(stmt.else_branch)
 
-    def visit_print_stmt(self, stmt: Print):
+    def visit_print_stmt(self, stmt ):
         self._resolve_expression(stmt.expression)
 
-    def visit_return_stmt(self, stmt: Return):
+    def visit_return_stmt(self, stmt ):
         if self.current_function == FunctionType.NONE:
             self.on_error(stmt.keyword, "Can't return from top-level code.")
 
@@ -242,7 +242,7 @@ class Resolver(ExprVisitor, StmtVisitor):
                 self.on_error(stmt.keyword, "Can't return a value from an initializer.")
             self._resolve_expression(stmt.value)
 
-    def visit_var_stmt(self, stmt: Var):
+    def visit_var_stmt(self, stmt ):
         self._declare(stmt.name)
 
         if stmt.initializer is not None:
@@ -250,6 +250,6 @@ class Resolver(ExprVisitor, StmtVisitor):
 
         self._define(stmt.name)
 
-    def visit_while_stmt(self, stmt: While):
+    def visit_while_stmt(self, stmt ):
         self._resolve_expression(stmt.condition)
         self._resolve_statement(stmt.body)

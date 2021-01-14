@@ -18,7 +18,7 @@ class Clock(YaploxCallable):
         """
         return time.time()
 
-    def arity(self) -> int:
+    def arity(self)  :
         """ "
         Since we do not have any arguments, return 0
         """

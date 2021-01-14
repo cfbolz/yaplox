@@ -8,7 +8,7 @@ class Token:
     Store parsed tokens
     """
 
-    def __init__(self, token_type: TokenType, lexeme: str, literal: Any, line: int):
+    def __init__(self, token_type , lexeme , literal , line ):
         """
         Create a new Token. In the Lox documentation `token_type` is called `type`.
         It has been renamed since `type` is a reserved keyword

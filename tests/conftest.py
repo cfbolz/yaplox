@@ -16,11 +16,11 @@ def create_token_factory():
     """
 
     def token_factory(
-        token_type: TokenType,
-        lexeme: Optional[str] = None,
-        literal: Optional[str] = None,
-        line: Optional[int] = 1,
-    ) -> Token:
+        token_type ,
+        lexeme  = None,
+        literal  = None,
+        line  = 1,
+    )  :
         values = {
             "token_type": token_type,
             "lexeme": lexeme,
@@ -45,7 +45,7 @@ def create_token_factory():
 
 @pytest.fixture
 def run_code_lines(capsys):
-    def code_lines(lines: List[str]) -> capsys:
+    def code_lines(lines )  :
 
         lines = "\n".join(lines)
         Yaplox().run(lines)
@@ -58,7 +58,7 @@ def run_code_lines(capsys):
 
 @pytest.fixture
 def run_code_block(capsys):
-    def code_block(block: str) -> capsys:
+    def code_block(block )  :
 
         Yaplox().run(block)
         captured = capsys.readouterr()

@@ -135,7 +135,7 @@ class TestInterpreter:
         tokens = scanner.scan_tokens()
         parser = Parser(tokens, on_token_error=on_parser_error_mock)
         statements = parser.parse()
-        expr: Expression = statements[0].expression
+        expr  = statements[0].expression
 
         assert isinstance(expr, Binary)
         assert isinstance(expr.left, Binary)

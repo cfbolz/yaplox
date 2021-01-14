@@ -7,14 +7,14 @@ from yaplox.yaplox_runtime_error import YaploxRuntimeError
 
 
 class Environment:
-    def __init__(self, enclosing: Optional[Environment] = None):
-        self.values: Dict[str, Any] = dict()
+    def __init__(self, enclosing  = None):
+        self.values   = dict()
         self.enclosing = enclosing
 
-    def define(self, name: str, value: Any):
+    def define(self, name , value ):
         self.values[name] = value
 
-    def _ancestor(self, distance: int) -> Environment:
+    def _ancestor(self, distance )  :
         environment = self
 
         for _ in range(distance):
@@ -22,13 +22,13 @@ class Environment:
 
         return environment
 
-    def get_at(self, distance: int, name: str) -> Any:
+    def get_at(self, distance , name )  :
         """
         Return a variable at a distance
         """
         return self._ancestor(distance=distance).values.get(name)
 
-    def get(self, name: Token) -> Any:
+    def get(self, name )  :
         try:
             return self.values[name.lexeme]
         except KeyError:
@@ -41,7 +41,7 @@ class Environment:
 
         raise YaploxRuntimeError(name, f"Undefined variable '{name.lexeme}'.")
 
-    def assign(self, name: Token, value: Any):
+    def assign(self, name , value ):
         """Assign a new value to an existing variable. Eg:
         var a = 3;
         a = 4  # This calls assign.
@@ -56,5 +56,5 @@ class Environment:
 
         raise YaploxRuntimeError(name, f"Undefined variable '{name.lexeme}'.")
 
-    def assign_at(self, distance: int, name: Token, value: Any):
+    def assign_at(self, distance , name , value ):
         self._ancestor(distance).values[name.lexeme] = value

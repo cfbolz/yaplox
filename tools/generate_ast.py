@@ -66,7 +66,7 @@ class GenerateAst:
 
         Path.mkdir(self.outputdir, parents=True)
 
-    def _define_ast(self, base_name: str, types: List, imports: Dict[str, List] = None):
+    def _define_ast(self, base_name , types , imports   = None):
         """
         Create a new ast class
 
@@ -110,7 +110,7 @@ class GenerateAst:
 
         self._write_file(base_name, lines)
 
-    def _define_imports(self, imports) -> List:
+    def _define_imports(self, imports)  :
         lines = []
 
         for module, identifiers in imports.items():
@@ -118,7 +118,7 @@ class GenerateAst:
 
         return lines
 
-    def _define_visitor(self, base_name: str, types: List) -> List:
+    def _define_visitor(self, base_name , types )  :
         """ Create the {base_name}Visitor """
 
         vistor_lines = [
@@ -138,7 +138,7 @@ class GenerateAst:
 
         return vistor_lines
 
-    def _define_type(self, base_name: str, class_name: str, fields_list: str) -> List:
+    def _define_type(self, base_name , class_name , fields_list )  :
         # __init__ method
         fields = [field.strip().split() for field in fields_list.split(", ")]
 
@@ -170,7 +170,7 @@ class GenerateAst:
         lines.extend(visitor_method)
         return lines
 
-    def _write_file(self, base_name: str, lines: List):
+    def _write_file(self, base_name , lines ):
         """ Write all the lines"""
         output_file = self.outputdir / f"{base_name.lower()}.py"
 

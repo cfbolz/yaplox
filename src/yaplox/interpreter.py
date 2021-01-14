@@ -53,7 +53,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
         self.globals.define("clock", Clock())
 
-    def interpret(self, statements: List[Stmt], on_error=None) -> Any:
+    def interpret(self, statements , on_error=None)  :
         try:
             res = None
             for statement in statements:
@@ -65,14 +65,14 @@ class Interpreter(ExprVisitor, StmtVisitor):
         except YaploxRuntimeError as excp:
             on_error(excp)
 
-    def _execute(self, stmt: Stmt):
+    def _execute(self, stmt ):
         return stmt.accept(self)
 
-    def resolve(self, expr: Expr, depth: int):
+    def resolve(self, expr , depth ):
         self.locals[expr] = depth
 
     @staticmethod
-    def _stringify(obj) -> str:
+    def _stringify(obj)  :
         if obj is None:
             return "nil"
 
@@ -96,7 +96,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
         )
 
     @staticmethod
-    def _is_equal(a, b) -> bool:
+    def _is_equal(a, b)  :
         if a is None and b is None:
             return True
 
@@ -105,7 +105,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
         return a == b
 
-    def visit_binary_expr(self, expr: Binary):
+    def visit_binary_expr(self, expr ):
         left = self._evaluate(expr.left)
         right = self._evaluate(expr.right)
         token_type = expr.operator.token_type
@@ -151,7 +151,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
                 expr.operator, f"Unknown operator {expr.operator.lexeme}"
             )
 
-    def visit_call_expr(self, expr: Call):
+    def visit_call_expr(self, expr ):
         function = self._evaluate(expr.callee)
 
         arguments = [self._evaluate(argument) for argument in expr.arguments]
@@ -167,20 +167,20 @@ class Interpreter(ExprVisitor, StmtVisitor):
             )
         return function.call(self, arguments)
 
-    def visit_get_expr(self, expr: Get):
+    def visit_get_expr(self, expr ):
         obj = self._evaluate(expr.obj)
         if isinstance(obj, YaploxInstance):
             return obj.get(expr.name)
 
         raise YaploxRuntimeError(expr.name, "Only instances have properties.")
 
-    def visit_grouping_expr(self, expr: Grouping):
+    def visit_grouping_expr(self, expr ):
         return self._evaluate(expr.expression)
 
-    def visit_literal_expr(self, expr: Literal):
+    def visit_literal_expr(self, expr ):
         return expr.value
 
-    def visit_logical_expr(self, expr: Logical):
+    def visit_logical_expr(self, expr ):
         left = self._evaluate(expr.left)
         if expr.operator.token_type == TokenType.OR:
             if self._is_truthy(left):
@@ -190,7 +190,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
                 return left
         return self._evaluate(expr.right)
 
-    def visit_set_expr(self, expr: Set):
+    def visit_set_expr(self, expr ):
         obj = self._evaluate(expr.obj)
 
         if not isinstance(obj, YaploxInstance):
@@ -200,9 +200,9 @@ class Interpreter(ExprVisitor, StmtVisitor):
         obj.set(expr.name, value)
         return value
 
-    def visit_super_expr(self, expr: Super):
+    def visit_super_expr(self, expr ):
         distance = self.locals[expr]
-        superclass: YaploxClass = self.environment.get_at(
+        superclass  = self.environment.get_at(
             distance=distance, name="super"
         )
         obj = self.environment.get_at(distance=distance - 1, name="this")
@@ -215,10 +215,10 @@ class Interpreter(ExprVisitor, StmtVisitor):
             )
         return method.bind(obj)
 
-    def visit_this_expr(self, expr: This):
+    def visit_this_expr(self, expr ):
         return self._look_up_variable(expr.keyword, expr)
 
-    def visit_unary_expr(self, expr: Unary):
+    def visit_unary_expr(self, expr ):
         right = self._evaluate(expr.right)
 
         token_type = expr.operator.token_type
@@ -229,13 +229,13 @@ class Interpreter(ExprVisitor, StmtVisitor):
             return not Interpreter._is_truthy(right)
 
     @staticmethod
-    def _check_number_operand(operator: Token, operand: Any):
+    def _check_number_operand(operator , operand ):
         if isinstance(operand, (float, int)):
             return
         raise YaploxRuntimeError(operator, f"{operand} must be a number.")
 
     @staticmethod
-    def _check_number_operands(operator: Token, left: Any, right: Any):
+    def _check_number_operands(operator , left , right ):
         if isinstance(left, (float, int)) and isinstance(right, (float, int)):
             return
         raise YaploxRuntimeError(operator, "Operands must be numbers.")
@@ -250,20 +250,20 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
         return True
 
-    def _evaluate(self, expr: Expr):
+    def _evaluate(self, expr ):
         return expr.accept(self)
 
-    def visit_variable_expr(self, expr: "Variable") -> Any:
+    def visit_variable_expr(self, expr )  :
         return self._look_up_variable(expr.name, expr)
 
-    def _look_up_variable(self, name: Token, expr: Expr) -> Any:
+    def _look_up_variable(self, name , expr )  :
         distance = self.locals.get(expr)
         if distance is not None:
             return self.environment.get_at(distance, name.lexeme)
         else:
             return self.globals.get(name)
 
-    def visit_assign_expr(self, expr: "Assign") -> Any:
+    def visit_assign_expr(self, expr )  :
         value = self._evaluate(expr.value)
         distance = self.locals.get(expr)
         if distance:
@@ -274,7 +274,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
         return value
 
     # statement stuff
-    def visit_class_stmt(self, stmt: Class):
+    def visit_class_stmt(self, stmt ):
         superclass = None
         if stmt.superclass is not None:
             superclass = self._evaluate(stmt.superclass)
@@ -289,7 +289,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
             self.environment = Environment(self.environment)
             self.environment.define("super", superclass)
 
-        methods: Dict[str, YaploxFunction] = {}
+        methods   = {}
 
         for method in stmt.methods:
             function = YaploxFunction(
@@ -306,44 +306,44 @@ class Interpreter(ExprVisitor, StmtVisitor):
 
         self.environment.assign(stmt.name, klass)
 
-    def visit_expression_stmt(self, stmt: Expression) -> None:
+    def visit_expression_stmt(self, stmt )  :
         return self._evaluate(stmt.expression)
 
-    def visit_function_stmt(self, stmt: Function) -> None:
+    def visit_function_stmt(self, stmt )  :
         function = YaploxFunction(stmt, self.environment, False)
         self.environment.define(stmt.name.lexeme, function)
 
-    def visit_if_stmt(self, stmt: If) -> None:
+    def visit_if_stmt(self, stmt )  :
         if self._is_truthy(self._evaluate(stmt.condition)):
             self._execute(stmt.then_branch)
         elif stmt.else_branch is not None:
             self._execute(stmt.else_branch)
 
-    def visit_while_stmt(self, stmt: While) -> None:
+    def visit_while_stmt(self, stmt )  :
         while self._is_truthy(self._evaluate(stmt.condition)):
             self._execute(stmt.body)
 
-    def visit_print_stmt(self, stmt: Print) -> None:
+    def visit_print_stmt(self, stmt )  :
         value = self._evaluate(stmt.expression)
         print(self._stringify(value))
 
-    def visit_return_stmt(self, stmt: Return) -> None:
+    def visit_return_stmt(self, stmt )  :
         value = None
         if stmt.value:
             value = self._evaluate(stmt.value)
         raise YaploxReturnException(value=value)
 
-    def visit_var_stmt(self, stmt: "Var") -> None:
+    def visit_var_stmt(self, stmt )  :
         value = None
         if stmt.initializer is not None:
             value = self._evaluate(stmt.initializer)
 
         self.environment.define(stmt.name.lexeme, value)
 
-    def visit_block_stmt(self, stmt: "Block") -> None:
+    def visit_block_stmt(self, stmt )  :
         self.execute_block(stmt.statements, Environment(self.environment))
 
-    def execute_block(self, statements: List[Stmt], environment: Environment):
+    def execute_block(self, statements , environment ):
         previous_env = self.environment
         try:
             self.environment = environment

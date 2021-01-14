@@ -10,14 +10,14 @@ if TYPE_CHECKING:
 
 
 class YaploxInstance:
-    def __init__(self, klass: YaploxClass):
+    def __init__(self, klass ):
         self.klass = klass
-        self.fields: Dict[str, Any] = {}
+        self.fields   = {}
 
-    def __repr__(self) -> str:
+    def __repr__(self)  :
         return f"{self.klass.name} instance"
 
-    def get(self, name: Token) -> Any:
+    def get(self, name )  :
         try:
             return self.fields[name.lexeme]
         except KeyError:
@@ -29,5 +29,5 @@ class YaploxInstance:
 
         raise YaploxRuntimeError(name, f"Undefined property '{name.lexeme}'.")
 
-    def set(self, name: Token, value: Any):
+    def set(self, name , value ):
         self.fields[name.lexeme] = value

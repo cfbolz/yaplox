@@ -17,11 +17,11 @@ logger = get_logger()
 
 class Yaplox:
     def __init__(self):
-        self.had_error: bool = False
-        self.had_runtime_error: bool = False
-        self.interpreter: Interpreter = Interpreter()
+        self.had_error  = False
+        self.had_runtime_error  = False
+        self.interpreter  = Interpreter()
 
-    def run(self, source: str):
+    def run(self, source ):
         logger.debug("Running line", source=source)
 
         scanner = Scanner(source, on_error=self.error)
@@ -46,35 +46,35 @@ class Yaplox:
 
         self.interpreter.interpret(statements, on_error=self.runtime_error)
 
-    def error(self, line: int, message: str):
+    def error(self, line , message ):
         self.report(line, "", message)
 
-    def runtime_error(self, error: YaploxRuntimeError):
+    def runtime_error(self, error ):
         message = f"{str(error.message)} in line [line{error.token.line}]"
         logger.warning(message)
         print(message, file=sys.stderr)
         self.had_runtime_error = True
 
-    def token_error(self, token: Token, message: str):
+    def token_error(self, token , message ):
         if token.token_type == TokenType.EOF:
             self.report(token.line, " At end ", message)
         else:
             self.report(token.line, f" at '{token.lexeme}'", message)
 
-    def report(self, line: int, where: str, message: str):
+    def report(self, line , where , message ):
         message = f"[line {line}] Error {where} : {message}"
         logger.warning(message)
         print(message, file=sys.stderr)
         self.had_error = True
 
     @staticmethod
-    def _load_file(file: str) -> str:  # pragma: no cover
+    def _load_file(file )  :  # pragma: no cover
         with open(file) as f:
             content = f.readlines()
             lines = "\n".join(content)
             return lines
 
-    def run_file(self, file: str):  # pragma: no cover
+    def run_file(self, file ):  # pragma: no cover
         """
         Run yaplox with `file` as filename for the source input
         """
