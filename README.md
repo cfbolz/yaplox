@@ -1,3 +1,9 @@
+# Fork
+
+This is a very hacky RPython fork of YaPlox. The tests and most of the nice
+infrastructure are broken. But it can be translated to C, and maybe a JIT can
+be generated. Original README below.
+
 # YaPlox - Yet Another Python implementation for Lox
 
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
