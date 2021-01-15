@@ -69,13 +69,7 @@ class Interpreter(EverythingVisitor):
 
     @staticmethod
     def _stringify(o)  :
-        if o is obj.w_nil:
-            return "nil"
-
-        if isinstance(o, obj.W_Number):
-            return str(o.num)
-
-        return str(o)
+        return o.str()
 
     @staticmethod
     def _binary_plus(expr, left, right):
