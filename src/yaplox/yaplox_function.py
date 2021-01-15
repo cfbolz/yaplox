@@ -1,4 +1,3 @@
-from yaplox.environment import Environment
 from yaplox.stmt import Function
 from yaplox.yaplox_callable import YaploxCallable
 from yaplox.yaplox_instance import YaploxInstance
@@ -17,29 +16,29 @@ class YaploxFunction(YaploxCallable):
         self.declaration = declaration
         self.is_initializer = is_initializer
 
-    def bind(self, instance )  :
-        environment = Environment(1, self.closure)
-        environment.define(0, instance)
-        return YaploxFunction(self.declaration, environment, self.is_initializer)
+    def bind(self, instance)  :
+        interp = self.closure.subinterp(1)
+        interp.values[0] = instance
+        return YaploxFunction(self.declaration, interp, self.is_initializer)
 
-    def call(self, interpreter, arguments):
-        environment = Environment(self.declaration.env_size, self.closure)
+    def call(self, arguments):
+        subinterp = self.closure.subinterp(self.declaration.env_size)
 
         for i in range(len(self.declaration.params)):
             declared_token = self.declaration.params[i]
             argument = arguments[i]
-            environment.define(i, argument)
+            subinterp.values[i] = argument
         try:
-            interpreter.execute_block(self.declaration.body, environment)
+            subinterp.execute_block(self.declaration.body)
         except YaploxReturnException as yaplox_return:
             if self.is_initializer:
                 # When we're in init(), return this as an early return
-                return self.closure.get_at(0, 0, "this")
+                return self.closure.values[0]
             return yaplox_return.value
 
         if self.is_initializer:
             # When init() is called directly on a class
-            return self.closure.get_at(0, 0, "this")
+            return self.closure.values[0]
 
     def arity(self)  :
         return len(self.declaration.params)

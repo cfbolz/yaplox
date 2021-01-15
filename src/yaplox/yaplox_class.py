@@ -4,12 +4,12 @@ from yaplox.yaplox_instance import YaploxInstance
 
 
 class YaploxClass(YaploxCallable):
-    def call(self, interpreter , arguments ):
+    def call(self, arguments):
         instance = YaploxInstance(klass=self)
         initializer = self.find_method("init")
         if initializer is not None:
             initializer.bind(instance=instance).call(
-                interpreter=interpreter, arguments=arguments
+                arguments
             )
         return instance
 

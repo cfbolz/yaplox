@@ -13,7 +13,7 @@ class Clock(YaploxCallable):
     @TODO Maybe rename it to CallableClock?
     """
 
-    def call(self, interpreter, arguments):
+    def call(self, arguments):
         """
         Return the time in seconds since the epoch as a floating point number
         """

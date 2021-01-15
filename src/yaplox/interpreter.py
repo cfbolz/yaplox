@@ -1,7 +1,7 @@
 from rpython.rlib import jit
 
 from yaplox.clock import Clock
-from yaplox.environment import Environment, Globals
+from yaplox.environment import Globals
 from yaplox.expr import (
     Assign,
     Binary,
@@ -43,23 +43,41 @@ from yaplox import obj
 
 
 class Interpreter(EverythingVisitor):
-    def __init__(self):
-        self.globals = Globals()
-        self.globals.define("clock", Clock())
-        self.environment = None
+    def __init__(self, size=0, enclosing=None, globals=None):
+        if globals is None:
+            if enclosing is None:
+                self.globals = Globals()
+                self.globals.define("clock", Clock())
+            else:
+                self.globals = enclosing.globals
+        else:
+            self.globals = globals
+        self.values   = [None] * size
+        self.enclosing = enclosing
+
+    def subinterp(self, size):
+        return Interpreter(size, self)
+
+    def _ancestor(self, distance )  :
+        environment = self
+
+        for _ in range(distance):
+            environment = environment.enclosing  # type: ignore
+
+        return environment
 
     def define(self, distance, position, name, w_val):
         if distance == -1:
             self.globals.define(name, w_val)
             return
         assert distance == 0
-        self.environment.define(position, w_val)
+        self.values[position] = w_val
 
     def assign(self, distance, position, name, w_val):
         if distance == -1:
             self.globals.assign(name, w_val)
             return
-        self.environment.assign_at(distance, position, w_val)
+        self._ancestor(distance).values[position] = w_val
 
     def interpret(self, program, on_error=None)  :
         try:
@@ -154,7 +172,7 @@ class Interpreter(EverythingVisitor):
                 expr.paren,
                 "Expected %s arguments but got %s." % (function.arity(), len(arguments)),
             )
-        return function.call(self, arguments)
+        return function.call(arguments)
 
     def visit_get_expr(self, expr ):
         obj = self._evaluate(expr.obj)
@@ -253,7 +271,7 @@ class Interpreter(EverythingVisitor):
         distance = expr.environment_distance
         position = expr.environment_index
         if distance >= 0:
-            return self.environment.get_at(distance, position, name.lexeme)
+            return self._ancestor(distance=distance).values[position]
         else:
             return self.globals.get(name.lexeme)
 
@@ -276,14 +294,14 @@ class Interpreter(EverythingVisitor):
         self.define(stmt.environment_distance, stmt.environment_index, stmt.name.lexeme, obj.w_nil)
 
         if stmt.superclass is not None:
-            self.environment = Environment(1, self.environment)
-            self.environment.define(0, superclass)
+            self = self.subinterp(1)
+            self.values[0] = superclass
 
         methods   = {}
 
         for method in stmt.methods:
             function = YaploxFunction(
-                method, self.environment, method.name.lexeme == "init"
+                method, self, method.name.lexeme == "init"
             )
             methods[method.name.lexeme] = function
 
@@ -292,14 +310,14 @@ class Interpreter(EverythingVisitor):
         )
 
         if stmt.superclass is not None:
-            self.environment = self.environment.enclosing  # type: ignore
+            self = self.enclosing
         self.assign(stmt.environment_distance, stmt.environment_index, stmt.name.lexeme, klass)
 
-    def visit_expression_stmt(self, stmt )  :
+    def visit_expression_stmt(self, stmt):
         return self._evaluate(stmt.expression)
 
-    def visit_function_stmt(self, stmt )  :
-        function = YaploxFunction(stmt, self.environment, False)
+    def visit_function_stmt(self, stmt):
+        function = YaploxFunction(stmt, self, False)
         self.define(stmt.environment_distance, stmt.environment_index, stmt.name.lexeme, function)
 
     def visit_if_stmt(self, stmt )  :
@@ -330,14 +348,8 @@ class Interpreter(EverythingVisitor):
         self.define(stmt.environment_distance, stmt.environment_index, stmt.name.lexeme, value)
 
     def visit_block_stmt(self, stmt )  :
-        self.execute_block(stmt.statements, Environment(stmt.env_size, self.environment))
+        self.subinterp(stmt.env_size).execute_block(stmt.statements)
 
-    def execute_block(self, statements , environment ):
-        previous_env = self.environment
-        try:
-            assert environment
-            self.environment = environment
-            for statement in statements:
-                self._execute(statement)
-        finally:
-            self.environment = previous_env
+    def execute_block(self, statements):
+        for statement in statements:
+            self._execute(statement)
