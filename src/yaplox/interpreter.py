@@ -110,6 +110,12 @@ class Interpreter(EverythingVisitor):
         elif token_type == TokenType.LESS_EQUAL:
             leftval, rightval = self._check_number_operands(expr.operator, left, right)
             return obj.newbool(leftval <= rightval)
+        elif token_type == TokenType.EQUAL_EQUAL:
+            leftval, rightval = self._check_number_operands(expr.operator, left, right)
+            return obj.newbool(leftval == rightval)
+        elif token_type == TokenType.BANG_EQUAL:
+            leftval, rightval = self._check_number_operands(expr.operator, left, right)
+            return obj.newbool(leftval <= rightval)
         elif token_type == TokenType.MINUS:
             leftval, rightval = self._check_number_operands(expr.operator, left, right)
             return obj.W_Number(leftval - rightval)
