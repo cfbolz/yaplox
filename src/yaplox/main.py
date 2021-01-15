@@ -30,12 +30,12 @@ class Yaplox:
             return
 
         resolver = Resolver(interpreter=self.interpreter, on_error=self.token_error)
-        resolver.resolve(statements)
+        program = resolver.resolve(statements)
         # Stop if there was a resolution error.
         if self.had_error:
             print("Error after resolving")
             return
-        return statements
+        return program
 
     def run(self, source ):
 
@@ -50,13 +50,13 @@ class Yaplox:
             return
 
         resolver = Resolver(interpreter=self.interpreter, on_error=self.token_error)
-        resolver.resolve(statements)
+        program = resolver.resolve(statements)
         # Stop if there was a resolution error.
         if self.had_error:
             print("Error after resolving")
             return
 
-        self.interpreter.interpret(statements, on_error=self.runtime_error)
+        self.interpreter.interpret(program, on_error=self.runtime_error)
 
     def error(self, line , message ):
         self.report(line, "", message)

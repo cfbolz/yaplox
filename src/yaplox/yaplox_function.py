@@ -18,28 +18,29 @@ class YaploxFunction(YaploxCallable):
         self.is_initializer = is_initializer
 
     def bind(self, instance )  :
-        environment = Environment(self.closure)
-        environment.define("this", instance)
+        import pdb; pdb.set_trace()
+        environment = Environment(1, self.closure)
+        environment.define(0, instance)
         return YaploxFunction(self.declaration, environment, self.is_initializer)
 
     def call(self, interpreter, arguments):
-        environment = Environment(self.closure)
+        environment = Environment(self.declaration.env_size, self.closure)
 
         for i in range(len(self.declaration.params)):
             declared_token = self.declaration.params[i]
             argument = arguments[i]
-            environment.define(declared_token.lexeme, argument)
+            environment.define(i, argument)
         try:
             interpreter.execute_block(self.declaration.body, environment)
         except YaploxReturnException as yaplox_return:
             if self.is_initializer:
                 # When we're in init(), return this as an early return
-                return self.closure.get_at(0, "this")
+                return self.closure.get_at(0, 0, "this")
             return yaplox_return.value
 
         if self.is_initializer:
             # When init() is called directly on a class
-            return self.closure.get_at(0, "this")
+            return self.closure.get_at(0, 0, "this")
 
     def arity(self)  :
         return len(self.declaration.params)

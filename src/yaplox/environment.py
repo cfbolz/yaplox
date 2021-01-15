@@ -2,14 +2,26 @@
 from yaplox.token import Token
 from yaplox.yaplox_runtime_error import YaploxRuntimeError
 
+class Globals(object):
+    def __init__(self):
+        self.globals = {}
+
+
+    def get(self, name):
+        return self.globals.get(name)
+
+    def assign(self, name, w_val):
+        self.globals[name] = w_val
+    define = assign
+
 
 class Environment:
-    def __init__(self, enclosing  = None):
-        self.values   = {}
+    def __init__(self, size, enclosing):
+        self.values   = [None] * size
         self.enclosing = enclosing
 
-    def define(self, name , value ):
-        self.values[name] = value
+    def define(self, position , value ):
+        self.values[position] = value
 
     def _ancestor(self, distance )  :
         environment = self
@@ -19,24 +31,11 @@ class Environment:
 
         return environment
 
-    def get_at(self, distance , name )  :
+    def get_at(self, distance, position, name)  :
         """
         Return a variable at a distance
         """
-        return self._ancestor(distance=distance).values.get(name)
-
-    def get(self, name )  :
-        try:
-            return self.values[name.lexeme]
-        except KeyError:
-            # We ignore this key error, if an nested Environment is available, test this
-            # first.
-            pass
-
-        if self.enclosing:
-            return self.enclosing.get(name)
-
-        raise YaploxRuntimeError(name, "Undefined variable '%s'." % (name.lexeme, ))
+        return self._ancestor(distance=distance).values[position]
 
     def assign(self, name , value ):
         """Assign a new value to an existing variable. Eg:
@@ -53,5 +52,5 @@ class Environment:
 
         raise YaploxRuntimeError(name, "Undefined variable '%s'." % (name.lexeme, ))
 
-    def assign_at(self, distance , name , value ):
-        self._ancestor(distance).values[name.lexeme] = value
+    def assign_at(self, distance, position, value):
+        self._ancestor(distance).values[position] = value

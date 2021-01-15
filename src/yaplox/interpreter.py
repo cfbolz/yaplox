@@ -1,7 +1,7 @@
 from rpython.rlib import jit
 
 from yaplox.clock import Clock
-from yaplox.environment import Environment
+from yaplox.environment import Environment, Globals
 from yaplox.expr import (
     Assign,
     Binary,
@@ -44,16 +44,28 @@ from yaplox import obj
 
 class Interpreter(EverythingVisitor):
     def __init__(self):
-        self.globals = Environment()
-        self.environment = self.globals
-        self.locals = {}
-
+        self.globals = Globals()
         self.globals.define("clock", Clock())
+        self.environment = None
 
-    def interpret(self, statements , on_error=None)  :
+    def define(self, distance, position, name, w_val):
+        if distance == -1:
+            self.globals.define(name, w_val)
+            return
+        assert distance == 0
+        self.environment.define(position, w_val)
+
+    def assign(self, distance, position, name, w_val):
+        if distance == -1:
+            self.globals.assign(name, w_val)
+            return
+        self.environment.define(position, w_val)
+        self.environment.assign_at(distance, position, w_val)
+
+    def interpret(self, program, on_error=None)  :
         try:
             res = None
-            for statement in statements:
+            for statement in program.statements:
                 res = self._execute(statement)
             # The return in the interpreter is not default Lox. It's added for now
             # to make testing and debugging easier.
@@ -63,9 +75,6 @@ class Interpreter(EverythingVisitor):
 
     def _execute(self, stmt ):
         return stmt.accept(self)
-
-    def resolve(self, expr , depth ):
-        self.locals[expr] = depth
 
     @staticmethod
     def _stringify(o)  :
@@ -128,6 +137,7 @@ class Interpreter(EverythingVisitor):
         elif token_type == TokenType.PLUS:
             return self._binary_plus(expr, left, right)
         else:
+            import pdb; pdb.set_trace()
             raise YaploxRuntimeError(
                 expr.operator, "Unknown operator %s" % (expr.operator.lexeme, )
             )
@@ -138,6 +148,7 @@ class Interpreter(EverythingVisitor):
         arguments = [self._evaluate(argument) for argument in expr.arguments]
 
         if not isinstance(function, YaploxCallable):
+            import pdb; pdb.set_trace()
             raise YaploxRuntimeError(expr.paren, "Can only call functions and classes.")
 
         # function = YaploxCallable(callee)
@@ -182,7 +193,8 @@ class Interpreter(EverythingVisitor):
         return value
 
     def visit_super_expr(self, expr ):
-        distance = self.locals[expr]
+        assert 0, "broken"
+        distance = expr.environment_distance
         superclass  = self.environment.get_at(
             distance=distance, name="super"
         )
@@ -241,20 +253,17 @@ class Interpreter(EverythingVisitor):
         return self._look_up_variable(expr.name, expr)
 
     def _look_up_variable(self, name , expr )  :
-        distance = self.locals.get(expr, -1)
+        distance = expr.environment_distance
+        position = expr.environment_index
         if distance >= 0:
-            return self.environment.get_at(distance, name.lexeme)
+            return self.environment.get_at(distance, position, name.lexeme)
         else:
-            return self.globals.get(name)
+            return self.globals.get(name.lexeme)
 
     def visit_assign_expr(self, expr )  :
         value = self._evaluate(expr.value)
-        distance = self.locals.get(expr, -1)
-        if distance >= 0:
-            self.environment.assign_at(distance, expr.name, value)
-        else:
-            self.globals.assign(expr.name, value)
-
+        distance = expr.environment_distance
+        self.assign(distance, expr.environment_index, expr.name.lexeme, value)
         return value
 
     # statement stuff
@@ -267,11 +276,11 @@ class Interpreter(EverythingVisitor):
                     stmt.superclass.name, "Superclass must be a class."
                 )
 
-        self.environment.define(stmt.name.lexeme, None)
+        self.define(stmt.environment_distance, stmt.environment_index, stmt.name.lexeme, obj.w_nil)
 
         if stmt.superclass is not None:
-            self.environment = Environment(self.environment)
-            self.environment.define("super", superclass)
+            self.environment = Environment(1, self.environment)
+            self.environment.define(0, superclass)
 
         methods   = {}
 
@@ -287,15 +296,14 @@ class Interpreter(EverythingVisitor):
 
         if stmt.superclass is not None:
             self.environment = self.environment.enclosing  # type: ignore
-
-        self.environment.assign(stmt.name, klass)
+        self.assign(stmt.environment_distance, stmt.environment_index, stmt.name.lexeme, klass)
 
     def visit_expression_stmt(self, stmt )  :
         return self._evaluate(stmt.expression)
 
     def visit_function_stmt(self, stmt )  :
         function = YaploxFunction(stmt, self.environment, False)
-        self.environment.define(stmt.name.lexeme, function)
+        self.define(stmt.environment_distance, stmt.environment_index, stmt.name.lexeme, function)
 
     def visit_if_stmt(self, stmt )  :
         if self._is_truthy(self._evaluate(stmt.condition)):
@@ -304,6 +312,7 @@ class Interpreter(EverythingVisitor):
             self._execute(stmt.else_branch)
 
     def visit_while_stmt(self, stmt )  :
+        import pdb; pdb.set_trace()
         while self._is_truthy(self._evaluate(stmt.condition)):
             self._execute(stmt.body)
 
@@ -318,20 +327,22 @@ class Interpreter(EverythingVisitor):
         raise YaploxReturnException(value=value)
 
     def visit_var_stmt(self, stmt )  :
-        value = None
+        value = obj.w_nil
         if stmt.initializer is not None:
             value = self._evaluate(stmt.initializer)
 
-        self.environment.define(stmt.name.lexeme, value)
+        self.define(stmt.environment_distance, stmt.environment_index, stmt.name.lexeme, value)
 
     def visit_block_stmt(self, stmt )  :
-        self.execute_block(stmt.statements, Environment(self.environment))
+        self.execute_block(stmt.statements, Environment(stmt.env_size, self.environment))
 
     def execute_block(self, statements , environment ):
         previous_env = self.environment
         try:
+            assert environment
             self.environment = environment
             for statement in statements:
                 self._execute(statement)
         finally:
+            print "setting environment to previous_env", previous_env
             self.environment = previous_env

@@ -40,9 +40,11 @@ class Stmt(Base):
     def accept(self, visitor ):
         raise NotImplementedError
 
+class EnvHaver(Stmt):
+    env_size = -1 # assigned by the resolver
 
-class Block(Stmt):
-    def __init__(self, statements ):
+class Block(EnvHaver):
+    def __init__(self, statements):
         self.statements = statements
 
     def accept(self, visitor ):
@@ -50,7 +52,7 @@ class Block(Stmt):
         return visitor.visit_block_stmt(self)
 
 
-class Class(Stmt):
+class Class(EnvHaver):
     def __init__(
         self, name , superclass , methods 
     ):
@@ -72,7 +74,10 @@ class Expression(Stmt):
         return visitor.visit_expression_stmt(self)
 
 
-class Function(Stmt):
+class Function(EnvHaver):
+    environment_distance = -1 # where is the function defined
+    environment_index = -1
+
     def __init__(self, name , params , body ):
         self.name = name
         self.params = params
@@ -131,3 +136,8 @@ class While(Stmt):
     def accept(self, visitor ):
         """ Create a accept method that calls the visitor. """
         return visitor.visit_while_stmt(self)
+
+class Program(object):
+    def __init__(self, statements):
+        self.statements = statements
+        

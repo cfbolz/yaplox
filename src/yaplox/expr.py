@@ -51,8 +51,12 @@ class Base(object):
 class Expr(Base):
     pass
 
+class EnvEntry(Expr):
+    environment_distance = -1 # -1 means global, positive number is distance of environments
+    environment_index = -1 # will be assigned by resolved
 
-class Assign(Expr):
+
+class Assign(EnvEntry):
     def __init__(self, name , value ):
         self.name = name
         self.value = value
@@ -134,7 +138,7 @@ class Set(Expr):
         return visitor.visit_set_expr(self)
 
 
-class Super(Expr):
+class Super(EnvEntry):
     def __init__(self, keyword , method ):
         self.keyword = keyword
         self.method = method
@@ -144,7 +148,7 @@ class Super(Expr):
         return visitor.visit_super_expr(self)
 
 
-class This(Expr):
+class This(EnvEntry):
     def __init__(self, keyword ):
         self.keyword = keyword
 
@@ -163,7 +167,7 @@ class Unary(Expr):
         return visitor.visit_unary_expr(self)
 
 
-class Variable(Expr):
+class Variable(EnvEntry):
     def __init__(self, name ):
         self.name = name
 
