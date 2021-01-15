@@ -136,7 +136,6 @@ class Interpreter(EverythingVisitor):
         elif token_type == TokenType.PLUS:
             return self._binary_plus(expr, left, right)
         else:
-            import pdb; pdb.set_trace()
             raise YaploxRuntimeError(
                 expr.operator, "Unknown operator %s" % (expr.operator.lexeme, )
             )
@@ -310,7 +309,6 @@ class Interpreter(EverythingVisitor):
             self._execute(stmt.else_branch)
 
     def visit_while_stmt(self, stmt )  :
-        import pdb; pdb.set_trace()
         while self._is_truthy(self._evaluate(stmt.condition)):
             self._execute(stmt.body)
 

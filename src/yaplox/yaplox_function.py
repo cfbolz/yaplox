@@ -18,7 +18,6 @@ class YaploxFunction(YaploxCallable):
         self.is_initializer = is_initializer
 
     def bind(self, instance )  :
-        import pdb; pdb.set_trace()
         environment = Environment(1, self.closure)
         environment.define(0, instance)
         return YaploxFunction(self.declaration, environment, self.is_initializer)
