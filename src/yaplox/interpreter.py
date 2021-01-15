@@ -59,7 +59,6 @@ class Interpreter(EverythingVisitor):
         if distance == -1:
             self.globals.assign(name, w_val)
             return
-        self.environment.define(position, w_val)
         self.environment.assign_at(distance, position, w_val)
 
     def interpret(self, program, on_error=None)  :
@@ -148,7 +147,6 @@ class Interpreter(EverythingVisitor):
         arguments = [self._evaluate(argument) for argument in expr.arguments]
 
         if not isinstance(function, YaploxCallable):
-            import pdb; pdb.set_trace()
             raise YaploxRuntimeError(expr.paren, "Can only call functions and classes.")
 
         # function = YaploxCallable(callee)
@@ -344,5 +342,4 @@ class Interpreter(EverythingVisitor):
             for statement in statements:
                 self._execute(statement)
         finally:
-            print "setting environment to previous_env", previous_env
             self.environment = previous_env
