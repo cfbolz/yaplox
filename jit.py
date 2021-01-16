@@ -41,7 +41,7 @@ fun main(start) {
     var xyz = start;
 
     while (xyz < 10000) {
-      xyz = xyz + 1 + 1 - 1;
+      xyz = xyz + 1;
     }
 }
 
