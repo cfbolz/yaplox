@@ -41,6 +41,7 @@ from yaplox.yaplox_runtime_error import YaploxRuntimeError
 from yaplox import obj
 
 
+driver = jit.JitDriver(reds=['self'], greens=['stmt'])
 
 class Interpreter(EverythingVisitor):
     def __init__(self, size=0, enclosing=None, globals=None):
@@ -58,6 +59,7 @@ class Interpreter(EverythingVisitor):
     def subinterp(self, size):
         return Interpreter(size, self)
 
+    @jit.unroll_safe
     def _ancestor(self, distance )  :
         environment = self
 
@@ -328,6 +330,7 @@ class Interpreter(EverythingVisitor):
 
     def visit_while_stmt(self, stmt )  :
         while self._is_truthy(self._evaluate(stmt.condition)):
+            driver.jit_merge_point(self=self, stmt=stmt)
             self._execute(stmt.body)
 
     def visit_print_stmt(self, stmt )  :
@@ -350,6 +353,7 @@ class Interpreter(EverythingVisitor):
     def visit_block_stmt(self, stmt )  :
         self.subinterp(stmt.env_size).execute_block(stmt.statements)
 
+    @jit.unroll_safe
     def execute_block(self, statements):
         for statement in statements:
             self._execute(statement)

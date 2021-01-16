@@ -6,6 +6,8 @@ class Token(object):
     Store parsed tokens
     """
 
+    _immutable_fields_ = ['token_type', 'lexeme', 'literal', 'line']
+
     def __init__(self, token_type , lexeme , literal , line ):
         """
         Create a new Token. In the Lox documentation `token_type` is called `type`.

@@ -26,6 +26,8 @@ class W_Nil(W_Root):
 w_nil = W_Nil()
 
 class W_Number(W_Root):
+    _immutable_fields_ = ['num']
+
     def __init__(self, num):
         self.num = num
 
@@ -33,6 +35,8 @@ class W_Number(W_Root):
         return str(self.num)
 
 class W_String(W_Root):
+    _immutable_fields_ = ['val']
+
     def __init__(self, val):
         self.val = val
 
