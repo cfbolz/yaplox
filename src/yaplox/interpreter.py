@@ -41,10 +41,10 @@ from yaplox.yaplox_runtime_error import YaploxRuntimeError
 from yaplox import obj
 
 
-driver = jit.JitDriver(reds=['self'], greens=['stmt'], virtualizables=['self'])
+driver = jit.JitDriver(reds=['self'], greens=['stmt']) # , virtualizables=['self'])
 
 class Interpreter(EverythingVisitor):
-    _virtualizable_ = ['values[*]', 'enclosing']
+    #_virtualizable_ = ['values[*]', 'enclosing']
 
     def __init__(self, size=0, enclosing=None, globals=None):
         self = jit.hint(self, access_directly=True, fresh_virtualizable=True)
@@ -173,7 +173,6 @@ class Interpreter(EverythingVisitor):
 
         if not isinstance(function, YaploxCallable):
             raise YaploxRuntimeError(expr.paren, "Can only call functions and classes.")
-        jit.promote(function)
 
         # function = YaploxCallable(callee)
         if len(arguments) != function.arity():

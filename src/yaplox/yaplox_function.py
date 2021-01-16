@@ -21,12 +21,14 @@ class YaploxFunction(YaploxCallable):
         self.is_initializer = is_initializer
 
     def bind(self, instance)  :
+        jit.promote(self.declaration)
         interp = self.closure.subinterp(1)
         interp.values[0] = instance
         return YaploxFunction(self.declaration, interp, self.is_initializer)
 
     @jit.unroll_safe
     def call(self, arguments):
+        jit.promote(self.declaration)
         subinterp = self.closure.subinterp(self.declaration.env_size)
 
         for i in range(len(self.declaration.params)):
@@ -46,6 +48,7 @@ class YaploxFunction(YaploxCallable):
             return self.closure.values[0]
 
     def arity(self)  :
+        jit.promote(self.declaration)
         return len(self.declaration.params)
 
     def __str__(self):

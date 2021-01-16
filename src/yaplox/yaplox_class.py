@@ -1,9 +1,13 @@
+from rpython.rlib import jit
+
 from yaplox.yaplox_callable import YaploxCallable
 from yaplox.yaplox_function import YaploxFunction
 from yaplox.yaplox_instance import YaploxInstance
 
 
 class YaploxClass(YaploxCallable):
+    _immutable_fields_ = ['name', 'superclass', 'methods']
+
     def call(self, arguments):
         instance = YaploxInstance(klass=self)
         initializer = self.find_method("init")
@@ -33,6 +37,7 @@ class YaploxClass(YaploxCallable):
     def __repr__(self):
         return self.name
 
+    @jit.elidable
     def find_method(self, name )  :
         try:
             return self.methods[name]
