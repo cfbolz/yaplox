@@ -79,7 +79,7 @@ class Expression(Stmt):
 
 
 class Function(EnvHaver):
-    _immutable_fields_ = ['environment_distance', 'environment_index', 'name', 'param[*]', 'body']
+    _immutable_fields_ = ['environment_distance', 'environment_index', 'name', 'params[*]', 'body']
 
     environment_distance = -1 # where is the function defined
     environment_index = -1

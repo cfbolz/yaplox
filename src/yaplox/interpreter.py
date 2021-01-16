@@ -41,10 +41,13 @@ from yaplox.yaplox_runtime_error import YaploxRuntimeError
 from yaplox import obj
 
 
-driver = jit.JitDriver(reds=['self'], greens=['stmt'])
+driver = jit.JitDriver(reds=['self'], greens=['stmt'], virtualizables=['self'])
 
 class Interpreter(EverythingVisitor):
+    _virtualizable_ = ['values[*]', 'enclosing']
+
     def __init__(self, size=0, enclosing=None, globals=None):
+        self = jit.hint(self, access_directly=True, fresh_virtualizable=True)
         if globals is None:
             if enclosing is None:
                 self.globals = Globals()
@@ -73,12 +76,14 @@ class Interpreter(EverythingVisitor):
             self.globals.define(name, w_val)
             return
         assert distance == 0
+        assert position >= 0
         self.values[position] = w_val
 
     def assign(self, distance, position, name, w_val):
         if distance == -1:
             self.globals.assign(name, w_val)
             return
+        assert position >= 0
         self._ancestor(distance).values[position] = w_val
 
     def interpret(self, program, on_error=None)  :
@@ -160,6 +165,7 @@ class Interpreter(EverythingVisitor):
                 expr.operator, "Unknown operator %s" % (expr.operator.lexeme, )
             )
 
+    @jit.unroll_safe
     def visit_call_expr(self, expr ):
         function = self._evaluate(expr.callee)
 
@@ -167,6 +173,7 @@ class Interpreter(EverythingVisitor):
 
         if not isinstance(function, YaploxCallable):
             raise YaploxRuntimeError(expr.paren, "Can only call functions and classes.")
+        jit.promote(function)
 
         # function = YaploxCallable(callee)
         if len(arguments) != function.arity():
@@ -273,6 +280,7 @@ class Interpreter(EverythingVisitor):
         distance = expr.environment_distance
         position = expr.environment_index
         if distance >= 0:
+            assert position >= 0
             return self._ancestor(distance=distance).values[position]
         else:
             return self.globals.get(name.lexeme)

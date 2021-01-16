@@ -1,3 +1,5 @@
+from rpython.rlib import jit
+
 from yaplox.stmt import Function
 from yaplox.yaplox_callable import YaploxCallable
 from yaplox.yaplox_instance import YaploxInstance
@@ -5,6 +7,8 @@ from yaplox.yaplox_return_exception import YaploxReturnException
 
 
 class YaploxFunction(YaploxCallable):
+    _immutable_fields_ = ['closure', 'declaration', 'is_initializer']
+
     def __init__(
         self,
         declaration ,
@@ -21,6 +25,7 @@ class YaploxFunction(YaploxCallable):
         interp.values[0] = instance
         return YaploxFunction(self.declaration, interp, self.is_initializer)
 
+    @jit.unroll_safe
     def call(self, arguments):
         subinterp = self.closure.subinterp(self.declaration.env_size)
 
