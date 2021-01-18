@@ -95,10 +95,11 @@ class Resolver(EverythingVisitor):
         self.scopes.append({})
 
     def _end_scope(self, stmt=None):
-        assert isinstance(stmt, EnvHaver)
+        scope = self.scopes.pop()
         if stmt is not None:
-            stmt.env_structure = self.scopes.pop()
-            stmt.env_size = len(stmt.env_structure)
+            assert isinstance(stmt, EnvHaver)
+            stmt.env_structure = scope
+            stmt.env_size = len(scope)
 
     def _declare(self, name, tok):
         """
