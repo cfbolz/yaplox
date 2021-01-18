@@ -57,7 +57,10 @@ class Interpreter(EverythingVisitor):
                 self.globals = enclosing.globals
         else:
             self.globals = globals
-        self.values   = [None] * size
+        if size:
+            self.values = [None] * size
+        else:
+            self.values = []
         self.enclosing = enclosing
 
     def subinterp(self, size):
@@ -218,6 +221,7 @@ class Interpreter(EverythingVisitor):
         superclass = self._look_up_variable(expr.keyword, expr)
         assert expr.environment_distance >= 1
         obj = self._ancestor(distance=expr.environment_distance - 1).values[0]
+        jit.promote(superclass)
         method = superclass.find_method(expr.method.lexeme)
 
         # Check that we have a super method

@@ -146,6 +146,8 @@ class Set(Expr):
 
 
 class Super(EnvEntry):
+    _immutable_fields_ = ['keyword', 'method']
+
     def __init__(self, keyword , method ):
         self.keyword = keyword
         self.method = method
