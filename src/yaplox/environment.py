@@ -2,11 +2,43 @@ from rpython.rlib import jit
 
 from yaplox.token import Token
 from yaplox.yaplox_runtime_error import YaploxRuntimeError
-from yaplox.obj import W_Root
+from yaplox.obj import W_Root, W_Number
 
 class Cell(W_Root):
+    def unwrap_cell(self):
+        raise NotImplementedError("abstract base")
+
+class ObjectCell(Cell):
     def __init__(self, value):
         self.value = value
+
+    def unwrap_cell(self):
+        return self.w_value
+
+
+class NumCell(Cell):
+    def __init__(self, numvalue):
+        self.numvalue = numvalue
+
+    def unwrap_cell(self):
+        return W_Number(self.numvalue)
+
+
+def write_cell(w_cell, w_value):
+    if w_cell is None:
+        # attribute does not exist at all, write it without a cell first
+        return w_value
+    if isinstance(w_cell, ObjectCell):
+        w_cell.w_value = w_value
+        return None
+    elif isinstance(w_cell, NumCell) and type(w_value) is W_Number:
+        w_cell.numvalue = w_value.num
+        return None
+    if type(w_value) is W_Number:
+        return NumCell(w_value.num)
+    else:
+        return ObjectCell(w_value)
+
 
 class Globals(object):
     _immutable_fields_ = ['version?']
@@ -20,7 +52,7 @@ class Globals(object):
         jit.promote(version)
         val = self._get(name, version)
         if isinstance(val, Cell):
-            return val.value
+            return val.unwrap_cell()
         else:
             return val
 
@@ -30,15 +62,11 @@ class Globals(object):
 
     def assign(self, name, w_val):
         oldval = self._get(name, jit.promote(self.version))
-        if oldval is None:
-            self.globals[name] = w_val
-            self.version += 1
-        else:
-            if isinstance(oldval, Cell):
-                oldval.value = w_val
-            else:
-                self.globals[name] = Cell(w_val)
-                self.version += 1
+        newval = write_cell(oldval, w_val)
+        if newval is None:
+            return # written via cell
+        self.globals[name] = newval
+        self.version += 1
 
     define = assign
 
