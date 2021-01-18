@@ -43,10 +43,10 @@ class EnvHaver(Stmt):
     env_size = -1 # assigned by the resolver
 
 class Block(EnvHaver):
-    _immutable_fields_ = ['statements']
+    _immutable_fields_ = ['statements[*]']
 
     def __init__(self, statements):
-        self.statements = statements
+        self.statements = statements[:]
 
     def accept(self, visitor ):
         """ Create a accept method that calls the visitor. """
@@ -79,7 +79,7 @@ class Expression(Stmt):
 
 
 class Function(EnvHaver):
-    _immutable_fields_ = ['environment_distance', 'environment_index', 'name', 'params[*]', 'body']
+    _immutable_fields_ = ['environment_distance', 'environment_index', 'name', 'params[*]', 'body[*]']
 
     environment_distance = -1 # where is the function defined
     environment_index = -1
@@ -87,7 +87,7 @@ class Function(EnvHaver):
     def __init__(self, name , params , body ):
         self.name = name
         self.params = params[:]
-        self.body = body
+        self.body = body[:]
 
     def accept(self, visitor ):
         """ Create a accept method that calls the visitor. """

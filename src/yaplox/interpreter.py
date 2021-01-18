@@ -1,3 +1,4 @@
+from rpython.rlib.debug import make_sure_not_resized
 from rpython.rlib import jit
 
 from yaplox.clock import Clock
@@ -362,5 +363,6 @@ class Interpreter(EverythingVisitor):
 
     @jit.unroll_safe
     def execute_block(self, statements):
+        make_sure_not_resized(statements)
         for statement in statements:
             self._execute(statement)

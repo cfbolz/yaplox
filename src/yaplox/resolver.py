@@ -48,7 +48,7 @@ class Resolver(EverythingVisitor):
         self.current_class = ClassType.NONE
 
     def resolve(self, statements ):
-        self._resolve_statements(statements)
+        self._resolve_statements(statements[:])
         return Program(statements)
 
     def _resolve_statements(self, statements ):
@@ -87,7 +87,7 @@ class Resolver(EverythingVisitor):
             self._declare(param.lexeme, param)
             self._define(param.lexeme)
 
-        self._resolve_statements(function.body)
+        self._resolve_statements(function.body[:])
         self._end_scope(function)
         self.current_function = enclosing_function
 

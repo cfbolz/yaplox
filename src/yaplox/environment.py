@@ -9,11 +9,13 @@ class Cell(W_Root):
         self.value = value
 
 class Globals(object):
+    _immutable_fields_ = ['version?']
     def __init__(self):
         self.globals = {}
         self.version = 0
 
     def get(self, name):
+        jit.promote(self)
         version = self.version
         jit.promote(version)
         val = self._get(name, version)
@@ -22,7 +24,7 @@ class Globals(object):
         else:
             return val
 
-    @jit.purefunction
+    @jit.elidable
     def _get(self, name, version):
         return self.globals.get(name)
 

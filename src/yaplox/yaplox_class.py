@@ -9,6 +9,7 @@ class YaploxClass(YaploxCallable):
     _immutable_fields_ = ['name', 'superclass', 'methods']
 
     def call(self, arguments):
+        jit.promote(self)
         instance = YaploxInstance(klass=self)
         initializer = self.find_method("init")
         if initializer is not None:
