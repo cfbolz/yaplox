@@ -298,8 +298,6 @@ class Interpreter(EverythingVisitor):
                     stmt.superclass.name, "Superclass must be a class."
                 )
 
-        self.define(stmt.environment_distance, stmt.environment_index, stmt.name.lexeme, obj.w_nil)
-
         if stmt.superclass is not None:
             self = self.subinterp(1)
             self.values[0] = superclass
