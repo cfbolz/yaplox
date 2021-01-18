@@ -217,12 +217,9 @@ class Interpreter(EverythingVisitor):
         return value
 
     def visit_super_expr(self, expr ):
-        assert 0, "broken"
-        distance = expr.environment_distance
-        superclass  = self.environment.get_at(
-            distance=distance, name="super"
-        )
-        obj = self.environment.get_at(distance=distance - 1, name="this")
+        superclass = self._look_up_variable(expr.keyword, expr)
+        assert expr.environment_distance >= 1
+        obj = self._ancestor(distance=expr.environment_distance - 1).values[0]
         method = superclass.find_method(expr.method.lexeme)
 
         # Check that we have a super method
