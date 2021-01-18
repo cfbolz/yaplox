@@ -119,13 +119,13 @@ class Interpreter(EverythingVisitor):
 
     @staticmethod
     def _is_equal(a, b)  :
-        if a is None and b is None:
-            return True
-
-        if a is None:
-            return False
-
-        return a == b
+        if a is obj.w_nil:
+            return b is obj.w_nil
+        if isinstance(a, obj.W_Number) and isinstance(b, obj.W_Number):
+            return a.num == b.num
+        if isinstance(a, obj.W_String) and isinstance(b, obj.W_String):
+            return a.val == b.val
+        return a is b
 
     def visit_binary_expr(self, expr ):
         left = self._evaluate(expr.left)
@@ -145,11 +145,9 @@ class Interpreter(EverythingVisitor):
             leftval, rightval = self._check_number_operands(expr.operator, left, right)
             return obj.newbool(leftval <= rightval)
         elif token_type == TokenType.EQUAL_EQUAL:
-            leftval, rightval = self._check_number_operands(expr.operator, left, right)
-            return obj.newbool(leftval == rightval)
+            return obj.newbool(self._is_equal(left, right))
         elif token_type == TokenType.BANG_EQUAL:
-            leftval, rightval = self._check_number_operands(expr.operator, left, right)
-            return obj.newbool(leftval <= rightval)
+            return obj.newbool(not self._is_equal(left, right))
         elif token_type == TokenType.MINUS:
             leftval, rightval = self._check_number_operands(expr.operator, left, right)
             return obj.W_Number(leftval - rightval)
