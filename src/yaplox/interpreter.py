@@ -42,7 +42,8 @@ from yaplox.yaplox_runtime_error import YaploxRuntimeError
 from yaplox import obj
 
 
-driver = jit.JitDriver(reds=['self'], greens=['stmt'], virtualizables=['self'])
+driver = jit.JitDriver(reds=['self'], greens=['stmt'], virtualizables=['self'], is_recursive=True)
+
 
 class Interpreter(EverythingVisitor):
     _virtualizable_ = ['values[*]', 'enclosing']

@@ -5,6 +5,7 @@ from yaplox.yaplox_callable import YaploxCallable
 from yaplox.yaplox_instance import YaploxInstance
 from yaplox.yaplox_return_exception import YaploxReturnException
 
+entrydriver = jit.JitDriver(greens=['declaration'], reds=['subinterp', 'self'], should_unroll_one_iteration=lambda *args: True)
 
 class YaploxFunction(YaploxCallable):
     _immutable_fields_ = ['closure', 'declaration', 'is_initializer']
@@ -28,15 +29,16 @@ class YaploxFunction(YaploxCallable):
 
     @jit.unroll_safe
     def call(self, arguments):
-        jit.promote(self.declaration)
-        subinterp = self.closure.subinterp(self.declaration.env_size)
+        declaration = jit.promote(self.declaration)
+        subinterp = self.closure.subinterp(declaration.env_size)
 
-        for i in range(len(self.declaration.params)):
-            declared_token = self.declaration.params[i]
+        for i in range(len(declaration.params)):
+            declared_token = declaration.params[i]
             argument = arguments[i]
             subinterp.values[i] = argument
+        entrydriver.jit_merge_point(declaration=declaration, subinterp=subinterp, self=self)
         try:
-            subinterp.execute_block(self.declaration.body)
+            subinterp.execute_block(declaration.body)
         except YaploxReturnException as yaplox_return:
             if self.is_initializer:
                 # When we're in init(), return this as an early return

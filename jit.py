@@ -232,3 +232,25 @@ fun main() {
 
 main();
 """)
+
+    def test_recursive(self):
+
+        self.run_string("""
+
+x = 1;
+x = 2;
+while (x > 1000) {
+}
+
+class Tree {
+  init(depth) {
+    this.depth = depth;
+    if (depth > 0) {
+      this.a = Tree(depth - 1);
+    }
+  }
+}
+
+Tree(4);
+
+""")
