@@ -22,6 +22,10 @@ class HiddenClass(object):
         self.next[name] = res
         return res
 
+    @jit.elidable
+    def length(self):
+        return len(self.layout)
+
 EMPTY = HiddenClass()
 
 class YaploxInstance(W_Root):
@@ -47,14 +51,21 @@ class YaploxInstance(W_Root):
 
         raise YaploxRuntimeError(name, "Undefined property '%s'." % (name.lexeme, ))
 
+    @jit.unroll_safe
     def set(self, name , value ):
         pos = jit.promote(self.hiddenclass).lookup_position(name.lexeme)
         if pos >= 0:
             self.storage[pos] = value
             return
         else:
-            self.storage = self.storage + [value]
+            oldstorage = self.storage
             self.hiddenclass = self.hiddenclass.add_field(name.lexeme)
+            newstorage = [None] * self.hiddenclass.length()
+            for i in range(len(newstorage) - 1):
+                newstorage[i] = oldstorage[i]
+            newstorage[len(newstorage) - 1] = value
+            self.storage = newstorage
+
 
 
 
